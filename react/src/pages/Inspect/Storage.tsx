@@ -12,22 +12,12 @@ const columns = [
   {
     key: 'storage_id',
     header: 'ID',
-    format: (storage_id: string, chainId: string) => {
-      return (
-        <code>{storage_id}</code>
-      )
-    }
+    format: displayMono
   },
   {
     key: 'owner',
     header: 'Owner',
-    format: (owner: string, chainId: string) => {
-      return (
-        <Link to={`/${chainId}/inspect/account/${owner}`}>
-          <code>{owner}</code>
-        </Link>
-      )
-    }
+    format: displayAddress
   },
   {
     key: 'registration_fee',

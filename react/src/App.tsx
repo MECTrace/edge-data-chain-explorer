@@ -105,7 +105,7 @@ const supportedNetworks = [
 const networkMap = new Set(supportedNetworks)
 
 const ExplorerBar = () => {
-  const classes = useStyles()
+  const styles = useStyles()
   const [tab, setTab] = useState<number>(0)
   const [searchText, setSearchText] = useState('')
   const isDesktop = useMediaQuery('(min-width: 1280px)')
@@ -177,19 +177,19 @@ const ExplorerBar = () => {
           marginRight: '12px'
         }}/>
         <Hidden only={['xs', 'sm']}>
-          <Typography variant={"h6"} className={classes.title}>
+          <Typography variant={"h5"} className={styles.title}>
             AMO Blockchain Explorer
           </Typography>
         </Hidden>
         <ThemeProvider theme={darkTheme}>
-          <FormControl className={classes.searchForm}>
+          <FormControl className={styles.searchForm}>
             <InputLabel id="network-select-label">
               Network
             </InputLabel>
             <Select
               value={chainId}
               labelId="network-select-label"
-              className={classes.mr2}
+              className={styles.mr2}
               onChange={onNetworkChange}
               style={{
                 width: '40%'
