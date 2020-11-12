@@ -11,7 +11,7 @@ COPY bin/ /app/bin/
 COPY db/ /app/db/
 COPY models/ /app/models/
 COPY routes/ /app/routes/
-COPY app.js config.js package.json package-lock.json /app/
+COPY app.js config.js package.json package-lock.json swaggerDef.js /app/
 
 # install package.json
 RUN npm install
