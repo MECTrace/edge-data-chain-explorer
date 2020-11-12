@@ -1,0 +1,181 @@
+@import "~vuetify/dist/vuetify.min.css";
+
+.v-application {
+  .subtitle-1 {
+    font-size: 18px !important;
+    font-weight: 400 !important;
+    letter-spacing: 0.009em !important;
+    line-height: 1.75rem !important;
+    font-family: 'Montserrat' !important;
+  }
+  .subtitle-2 {
+    font-size: 16px !important;
+    font-weight: 400 !important;
+    letter-spacing: 0.009em !important;
+    line-height: 1.75rem !important;
+    font-family: 'Montserrat' !important;
+  }
+}
+@media (max-width: 960px) {
+  .v-text-field--outlined fieldset{
+    border-color: #f6e66c;
+    //border-color: #1bbae6;
+    min-height: 0px;
+    //40
+    height: 35px;
+    top: -2px;
+  }
+
+  .v-select__slot {
+    top: -5px !important;
+
+    label {
+      font-size: 12px;
+      letter-spacing: 0.1em;
+    }
+    .v-select__selection {
+      font-size: 12px;
+      letter-spacing: 0.1em;
+    }
+
+    .theme--light.v-icon {
+      //color: red !important;
+    }
+    .theme--dark.v-icon {
+      //color: #1bbae6 !important;
+      color: #f6e66c !important;
+    }
+  }
+  .v-input__slot {
+    min-height: 20px;
+
+    .v-input__prepend-inner {
+      .v-input__icon {
+        i {
+          font-size: 20px !important;
+          margin-top: -27px !important;
+        }
+      }
+      .v-text-field__slot {
+        top: -5px;
+      }
+    }
+
+  }
+
+  .v-text-field__slot {
+    top: 0px !important;
+
+    label {
+      font-size: 12px;
+      letter-spacing: 0.1em;
+      top: 4px !important;
+    }
+    i {
+      width: 10px;
+      height: 10px;
+    }
+    input {
+      font-size: 12px;
+      letter-spacing: 0.1em;
+      margin-top: -24px !important;
+    }
+    .v-select__selection {
+      font-size: 12px;
+      letter-spacing: 0.1em;
+    }
+  }
+}
+
+
+@media (min-width: 960px){
+
+  .v-text-field--outlined fieldset{
+    //border-color: #1bbae6;
+    border-color: #f6e66c;
+    min-height: 0px;
+    height: 40px;
+    top: -2px;
+  }
+
+
+  .v-select__slot {
+    top: -2px !important;
+
+    label {
+      font-size: 12px;
+      letter-spacing: 0.1em;
+    }
+    .v-select__selection {
+      font-size: 14px;
+      letter-spacing: 0.1em;
+    }
+
+    .theme--light.v-icon {
+      //color: red !important;
+    }
+    .theme--dark.v-icon {
+      //color: #1bbae6 !important;
+      color: #f6e66c !important;
+    }
+  }
+  .v-input__slot {
+    min-height: 20px;
+
+    .v-input__prepend-inner {
+      .v-input__icon {
+        i {
+          font-size: 22px !important;
+          margin-top: -2px !important;
+        }
+      }
+      .v-text-field__slot {
+        top: -5px;
+      }
+    }
+
+  }
+
+  .v-text-field__slot {
+    top: 0px !important;
+
+    label {
+      font-size: 12px;
+      letter-spacing: 0.1em;
+      top: 8px !important;
+    }
+    i {
+      width: 10px;
+      height: 10px;
+    }
+    input {
+      font-size: 13px;
+      letter-spacing: 0.1em;
+      margin-top: -4px !important;
+    }
+    .v-select__selection {
+      font-size: 12px;
+      letter-spacing: 0.1em;
+    }
+  }
+
+}
+
+
+@media (min-width: 1264px) {
+  .container {
+    max-width: 1300px !important;
+  }
+}
+@media (min-width: 1904px) {
+  .container {
+    max-width: 1600px !important;
+  }
+}
+
+//.container {
+//  @media (min-width: 1264px) {
+//    max-width: 1300px;
+//  }
+//
+//}
