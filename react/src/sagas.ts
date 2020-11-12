@@ -2,7 +2,7 @@ import Axios, {AxiosRequestConfig} from "axios"
 import {put, select, takeEvery} from 'redux-saga/effects'
 import {newBlockchainState, newRecentTxs, UPDATE_BLOCKCHAIN, UPDATE_RECENT_TXS} from "./reducer/blockchain"
 import {AMO} from "./util"
-import {newBlocksAction, UPDATE_BLOCKS} from "./reducer/blocks"
+import {newBlocksAction, FETCH_RECENT_BLOCKS} from "./reducer/blocks"
 import ExplorerAPI from "./ExplorerAPI"
 
 const server = 'http://explorer.amolabs.io/api'
@@ -111,5 +111,5 @@ export function* syncRecentTxs() {
 }
 
 export function* syncRecentBlocks() {
-  yield takeEvery(UPDATE_BLOCKS, fetchRecentBlocks)
+  yield takeEvery(FETCH_RECENT_BLOCKS, fetchRecentBlocks)
 }

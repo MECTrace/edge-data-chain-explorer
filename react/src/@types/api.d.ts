@@ -1,3 +1,7 @@
+type Network = {
+  chain_id: string,
+}
+
 type AccountSchema = {
   chain_id: string,
   address: string,

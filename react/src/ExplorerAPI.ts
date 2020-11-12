@@ -10,6 +10,11 @@ const client = Axios.create({
 
 type Result<T> = Promise<AxiosResponse<T>>
 
+const fetchNetworks = (): Result<Network[]> => {
+  return client
+    .get(`/networks`)
+}
+
 const fetchBlocks = (chainId: string, blockHeight: number, size: number = 20): Result<BlockState[]> => {
   return client
     .get(`/chain/${chainId}/blocks?anchor=${blockHeight}&num=${size}&order=desc`)
@@ -107,6 +112,7 @@ const fetchStorage = (chainId: string, storageId: number): Result<StorageInfo> =
 }
 
 export default {
+  fetchNetworks,
   fetchBlocks,
   fetchBlocksStats,
   fetchTransactions,

@@ -6,8 +6,8 @@ const graphState = {
 }
 
 const initialBlockState = {
-  height: 1,
-  chain_id: 'amo-cherryblossom-01',
+  height: 0,
+  chain_id: '',
   num_blocks: 0,
   num_txs: 0,
   avg_interval: 0,
@@ -19,7 +19,7 @@ const initialBlockState = {
   active_coins: '0',
   stakes: '0',
   delegates: '0',
-  time: '2020-04-03T01:08:59.479Z',
+  time: '',
   tx_height: 0,
   tx_index: 0,
   coinsStats: [graphState, graphState, graphState],
@@ -41,8 +41,8 @@ export const initialTransactions = {
 }
 
 const initialState = {
-  chainId: 'amo-cherryblossom-01',
-  height: 1,
+  chainId: '',
+  height: 0,
   updated: false,
   blockState: initialBlockState,
   recentTxs: [initialTransactions],
