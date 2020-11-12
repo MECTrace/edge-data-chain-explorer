@@ -66,16 +66,14 @@ type ValidatorStat = {
   num_validators: number
 }
 
-type NodeInfo = {
-  node_id: string,
-  moniker: string,
-  val_addr: string,
-  latest_block_height: number,
-  latest_block_time: string,
-  catching_up: number,
-  elapsed: number,
-  timestamp: string,
-  uptime: number,
+type StorageInfo = {
+  chain_id: string,
+  storage_id: number,
+  url: string,
+  registration_fee: string,
+  hosting_fee: string,
+  owner: string,
+  active: boolean,
 }
 
 // https://github.com/amolabs/docs/blob/master/protocol.md#top-level-data

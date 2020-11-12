@@ -22,7 +22,6 @@ from filelock import FileLock, Timeout
 import dbproxy
 
 REQUEST_TIMEOUT = 5 
-DEFAULT_RPC_PORT = 26657
 
 
 def neighbors(addr):
@@ -30,18 +29,18 @@ def neighbors(addr):
         if args.verbose: print(f'collecting neighbors from {addr}')
         else: print('.', end='', flush=True)
         res = r.get(url=f'http://{addr}/net_info', timeout=REQUEST_TIMEOUT)
-        peers = json.loads(res.text)['result']['peers']
-        ps = []
-        for p in peers:
-            ip = p['remote_ip']
-            #p2p_addr = p['node_info']['listen_addr'].split('tcp://')[1]
-            #ip = p2p_addr.split(':')[0]
-            #p2p_port = p2p_addr.split(':')[1]
-            rpc_addr = p['node_info']['other']['rpc_address'].split('tcp://')[1]
-            rpc_port = rpc_addr.split(':')[1]
-            ps.append(f'{ip}:{rpc_port}')
     except Exception:
         return []
+    peers = json.loads(res.text)['result']['peers']
+    ps = []
+    for p in peers:
+        ip = p['remote_ip']
+        #p2p_addr = p['node_info']['listen_addr'].split('tcp://')[1]
+        #ip = p2p_addr.split(':')[0]
+        #p2p_port = p2p_addr.split(':')[1]
+        rpc_addr = p['node_info']['other']['rpc_address'].split('tcp://')[1]
+        rpc_port = rpc_addr.split(':')[1]
+        ps.append(f'{ip}:{rpc_port}')
     return ps
 
 
@@ -51,11 +50,11 @@ async def peek(addr):
         else: print('.', end='', flush=True)
         f = functools.partial(r.get, url=f'http://{addr}/status', timeout=REQUEST_TIMEOUT)
         res = await loop.run_in_executor(None, f)
-        node = json.loads(res.text)['result']
-        node['elapsed'] = res.elapsed.total_seconds()
     except Exception:
         if args.verbose: print(f'{addr} is unreachable')
         return {}
+    node = json.loads(res.text)['result']
+    node['elapsed'] = res.elapsed.total_seconds()
     return node
 
 
@@ -95,21 +94,8 @@ async def inspect(nodes, n, timestamp):
     node_info = known[n]
     peek_n = await peek(n)
     if peek_n == {}:  # unreachable
-        if 'node_id' in list(node_info.keys()):
-            # pre-collected node
-            node_info['n_peers'] = 0
-            node_info['val_addr'] = ''
-            node_info['latest_block_time'] = datetime.fromordinal(1) 
-            node_info['latest_block_height'] = 0
-            node_info['catching_up'] = False
-            node_info['elapsed'] = 0
-            node_info['online'] = False
-        else:
-            return # ignore new node
-    else:
-        node_info.update(expand(peek_n))
-        node_info['online'] = True
-
+        return
+    node_info.update(expand(peek_n))
     node_info['timestamp'] = timestamp
     nodes[n] = node_info
 
@@ -120,19 +106,38 @@ async def collect_info(known):
     futures = [asyncio.ensure_future(inspect(nodes, n, timestamp)) for n in known]
     await asyncio.gather(*futures)
 
+    # append ghost node
+    ghost_n = {}
+    ghost_n['chain_id'] = 'ghost_chain_id'
+    ghost_n['node_id'] = 'ghost_node_id'
+    ghost_n['moniker'] = 'ghost_moniker'
+    ghost_n['ip_addr'] = '0.0.0.0'
+    ghost_n['rpc_addr'] = '0.0.0.0:26657'
+    ghost_n['timestamp'] = timestamp
+    ghost_n['n_peers'] = '0'
+    ghost_n['val_addr'] = 'ghost_val_addr'
+    ghost_n['latest_block_time'] = timestamp
+    ghost_n['latest_block_height'] = '0'
+    ghost_n['catching_up'] = '0'
+    ghost_n['elapsed'] = '0'
+    nodes['ghost_node'] = ghost_n
+
     if not args.verbose:
         print(' done')
 
     return nodes
 
+
 def print_nodes(nodes):
+    if len(nodes) == 1:
+        return
     # this is just for neat display
     # clen = 0
     mlen = 0
     alen = 0
     monikers = {}
     for k, n in nodes.items():
-        if not n['online']:
+        if k == 'ghost_node':
             continue
         # clen = max(clen, len(n['chain_id']))
         mlen = max(mlen, len(n['moniker']))
@@ -140,9 +145,10 @@ def print_nodes(nodes):
         monikers[n['chain_id'] + '_' + n['moniker']] = n
 
     for k in sorted(monikers.keys()):
-        n = monikers[k]
-        if not n['online']:
+        if k == 'ghost_node':
             continue
+
+        n = monikers[k]
         # print(f'{n["chain_id"]:{clen}}', end=' ', flush=True)
         print(f'{n["moniker"]:{mlen}}', end=' ', flush=True)
         print(f'{n["rpc_addr"]:{alen}}', end=' ', flush=True)
@@ -151,25 +157,6 @@ def print_nodes(nodes):
         print(f'{n["catching_up_sign"]}', end=' ', flush=True)
         print(f'{n["voting_power"]:>{20}}', end=' ', flush=True)
         print(f'{n["elapsed"]}s', flush=True)
-
-
-def query_nodes(db):
-    nodes = {}
-    cur = db.cursor()
-    cur.execute(
-        """
-        SELECT 
-            `chain_id`, `node_id`, `timestamp`, 
-            `moniker`, INET_NTOA(`ip_addr`) `ip_addr`
-        FROM `nodes`
-        """)
-    rows = cur.fetchall()
-    if rows:
-        for row in rows:
-            d = dict(zip(cur.column_names, row))
-            nodes[f'{d["ip_addr"]}:{DEFAULT_RPC_PORT}'] = d
-
-    return nodes
 
 
 def update_nodes(db, nodes):
@@ -196,11 +183,11 @@ def update_nodes(db, nodes):
             INSERT IGNORE INTO `node_history`
                 (`chain_id`, `node_id`, `timestamp`, `n_peers`,
                  `val_addr`, `latest_block_time`, `latest_block_height`,
-                 `catching_up`, `elapsed`, `online`)
+                 `catching_up`, `elapsed`)
             VALUES
                 (%(chain_id)s, %(node_id)s, %(timestamp)s, %(n_peers)s,
                  %(val_addr)s, %(latest_block_time)s, %(latest_block_height)s,
-                 %(catching_up)s, %(elapsed)s, %(online)s)
+                 %(catching_up)s, %(elapsed)s)
             """, n)
 
     db.commit()
@@ -249,18 +236,14 @@ if __name__ == '__main__':
     try:
         tt = time()
 
-        known = {}
         cands = []
-        if not args.dry:
-            known = query_nodes(db)
-            cands += list(known.keys())
-
         for t in args.targets:
             host, port = t.split(':')
             ip = socket.gethostbyname(host)
             n_addr = f'{ip}:{port}'
             cands.append(n_addr)
 
+        known = {}
         # collecting nodes
         if not args.verbose:
             print('collecting', end='', flush=True)
@@ -268,11 +251,8 @@ if __name__ == '__main__':
         while cands:
             n = cands.pop()
             peers = neighbors(n)
-            if n in known:
-                known[n]['n_peers'] = len(peers)
-            else:
+            if n not in known:
                 known[n] = {'n_peers': len(peers)}
-
             for n in peers:
                 if n not in known and n not in cands:
                     cands.append(n)
@@ -284,7 +264,7 @@ if __name__ == '__main__':
 
         # updating nodes
         if not args.dry:
-            print(f'updating {len(nodes)} nodes', end=' - ', flush=True)
+            print(f'updating {len(nodes)-1} nodes', end=' - ', flush=True)
             update_nodes(db, nodes)
             print('done !')
         if args.dry or args.verbose:

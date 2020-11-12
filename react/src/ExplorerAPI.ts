@@ -96,9 +96,14 @@ const fetchDraft = (chainId: string, draftId: number): Result<Draft> => {
     .get(`/chain/${chainId}/drafts/${draftId}`)
 }
 
-const fetchNodes = (chainId: string, range: number = 60, from: number = 0, num: number = 20): Result<NodeInfo[]> => {
+const fetchStorages = (chainId: string): Result<StorageInfo[]> => {
   return client
-    .get(`/chain/${chainId}/nodes?from=${from}&num=${num}`)
+    .get(`chain/${chainId}/storages`)
+}
+
+const fetchStorage = (chainId: string, storageId: number): Result<StorageInfo> => {
+  return client
+    .get(`chain/${chainId}/storages/${storageId}`)
 }
 
 export default {
@@ -118,5 +123,6 @@ export default {
   fetchDelegators,
   fetchDrafts,
   fetchDraft,
-  fetchNodes,
+  fetchStorages,
+  fetchStorage,
 }

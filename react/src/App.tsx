@@ -28,7 +28,7 @@ import {RootState} from "./reducer"
 import Blocks from "./pages/Blocks"
 import Inspect from "./pages/Inspect"
 import Validators from "./pages/Validators"
-import Nodes from "./pages/Nodes"
+import Storages from "./pages/Storages"
 import Footer from "./component/Footer"
 
 const useStyles = makeStyles((theme) => ({
@@ -80,8 +80,8 @@ const routers: RouteProps[] = [
     component: Validators
   },
   {
-    path: '/:chainId/nodes',
-    component: Nodes
+    path: '/:chainId/storages',
+    component: Storages
   },
 ]
 
@@ -93,7 +93,7 @@ const tabList = [
   'blocks',
   'transactions',
   'validators',
-  'nodes',
+  'storages',
 ]
 
 const supportedNetworks = [
@@ -173,7 +173,7 @@ const ExplorerBar = () => {
     <AppBar position="fixed">
       <Toolbar>
         <img src={require('./assets/amo_white.png')} alt="logo" style={{
-          height: '30px',
+          height: '36px',
           marginRight: '12px'
         }}/>
         <Hidden only={['xs', 'sm']}>
