@@ -26,7 +26,7 @@ const store = (() => {
 
   const enhancer = process.env.NODE_ENV === 'production' ?
     compose(applyMiddleware(...middleware)) :
-    composeWithDevTools({trace: true, traceLimit: 100})(
+    composeWithDevTools(
       applyMiddleware(...middleware)
     )
 
