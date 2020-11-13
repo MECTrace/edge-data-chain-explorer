@@ -18,6 +18,7 @@ from dateutil.parser import parse as dateparse
 
 # third-party imports
 import requests as r
+from error import ArgError
 from filelock import FileLock, Timeout
 
 import dbproxy
@@ -27,7 +28,8 @@ DEFAULT_REFRESH_INTERVAL = 10
 DEFAULT_RPC_PORT = 26657
 
 class Nodes:
-    def __init__(self, targets, db=None, verbose=False, dry=False):
+    def __init__(self, chain_id, targets, db=None, verbose=False, dry=False):
+        self.chain_id = ""
         self.targets = []
         self.known = {}
         self.nodes = {}
@@ -40,6 +42,10 @@ class Nodes:
         self.loop = None
         self.futures = []
 
+        if chain_id is None:
+            raise ArgError('no chain_id is given.')
+        self.chain_id = chain_id
+
         if targets is not None:
             self.targets = targets
 
@@ -47,7 +53,7 @@ class Nodes:
             db = dbproxy.connect_db()
         self.db = db
 
-        lock = FileLock('/var/tmp/nodes.lock')
+        lock = FileLock('/var/tmp/nodes-{self.chain_id}.lock')
         try:
             lock.acquire(timeout=1)
         except Timeout:
@@ -59,7 +65,7 @@ class Nodes:
         if not self.dry:
             self.known = self._query_nodes()
 
-        if len(self.known) == 0 and len(targets) == 0:
+        if len(self.known) == 0 and len(self.targets) == 0:
             raise ArgError('no targets are given.')
 
    
@@ -76,7 +82,8 @@ class Nodes:
                 `chain_id`, `node_id`, `timestamp`, 
                 `moniker`, INET_NTOA(`ip_addr`) `ip_addr`
             FROM `nodes`
-            """)
+            WHERE `chain_id` = %(chain_id)s
+            """, {'chain_id': self.chain_id})
         rows = cur.fetchall()
         if rows:
             for row in rows:
@@ -303,7 +310,15 @@ def handle(sig, stack_frame):
 if __name__ == '__main__':
     # command line args
     p = argparse.ArgumentParser(description='AMO blockchain node inspector')
-    p.add_argument('targets', type=str, nargs='+')
+    p.add_argument("-c",
+                   "--chain_id",
+                   help="chain id to query nodes from",
+                   type=str)
+    p.add_argument("-t",
+                   "--targets",
+                   help="seed targets to crawl",
+                   type=str,
+                   nargs='+')
     p.add_argument("-v",
                    "--verbose",
                    help="verbose output",
@@ -326,7 +341,7 @@ if __name__ == '__main__':
     args = p.parse_args()
 
     try:
-        nodes = Nodes(targets=args.targets, verbose=args.verbose, dry=args.dry) 
+        nodes = Nodes(chain_id=args.chain_id, targets=args.targets, verbose=args.verbose, dry=args.dry) 
     except ArgError as err:
         print(err)
         sys.exit(-1)
