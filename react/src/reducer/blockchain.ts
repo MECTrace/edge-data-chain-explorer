@@ -41,8 +41,8 @@ export const initialTransactions = {
 }
 
 const initialState = {
-  chainId: 'amo-cherryblossom-01',
-  height: 1,
+  chainId: '',
+  height: 0,
   updated: false,
   blockState: initialBlockState,
   recentTxs: [initialTransactions],
@@ -58,21 +58,12 @@ export type TransactionSchema = typeof initialTransactions
 
 export const UPDATE_BLOCKCHAIN = 'UPDATE_BLOCKCHAIN'
 
-export const UPDATE_RECENT_TXS = 'UPDATE_RECENT_TXS'
-
 export const NEW_BLOCKCHAIN = 'NEW_BLOCKCHAIN'
-
-export const NEW_RECENT_TXS = 'NEW_RECENT_TXS'
 
 export const SET_NETWORK = 'SET_NETWORK'
 
 export const newBlockchainState = (payload: BlockchainState) => ({
   type: NEW_BLOCKCHAIN,
-  payload
-})
-
-export const newRecentTxs = (payload: TransactionSchema[]) => ({
-  type: NEW_RECENT_TXS,
   payload
 })
 
@@ -86,11 +77,6 @@ interface NewBlockchainStateAction extends Action {
   payload: BlockchainState
 }
 
-interface NewRecentTransactions extends Action {
-  type: typeof NEW_RECENT_TXS,
-  payload: TransactionSchema[]
-}
-
 export interface SetNetwork extends Action {
   type: typeof SET_NETWORK,
   payload: string
@@ -98,10 +84,8 @@ export interface SetNetwork extends Action {
 
 type actions =
   NewBlockchainStateAction |
-  NewRecentTransactions |
   SetNetwork |
-  Action<typeof UPDATE_BLOCKCHAIN> |
-  Action<typeof UPDATE_RECENT_TXS>
+  Action<typeof UPDATE_BLOCKCHAIN>
 
 export default (state: BlockchainInitialState = initialState, action: actions) => {
   switch (action.type) {
@@ -115,11 +99,6 @@ export default (state: BlockchainInitialState = initialState, action: actions) =
         blockState: action.payload,
         height: action.payload.height,
         updated: true
-      }
-    case NEW_RECENT_TXS:
-      return {
-        ...state,
-        recentTxs: action.payload
       }
     case SET_NETWORK:
       return {
