@@ -5,7 +5,11 @@ import ExplorerAPI from "../../ExplorerAPI"
 import InformationCard from "../../component/InformationCard"
 import {useDispatch} from "react-redux"
 import {replace} from "connected-react-router"
-import {AMO, displayAddress, displayMono} from "../../util"
+import {
+  displayAMO,
+  displayAddress,
+  displayMono,
+} from "../../util"
 //import CollapseTable from "../../component/CollapseTable"
 
 const columns = [
@@ -23,14 +27,14 @@ const columns = [
     key: 'registration_fee',
     header: 'Registration fee',
     format: (registration_fee: string, chainId: string) => {
-      return AMO(registration_fee)
+      return displayAMO(registration_fee)
     }
   },
   {
     key: 'hosting_fee',
     header: 'Hosting fee',
     format: (hosting_fee: string, chainId: string) => {
-      return AMO(hosting_fee)
+      return displayAMO(hosting_fee)
     }
   },
   {

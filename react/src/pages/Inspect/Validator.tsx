@@ -3,7 +3,12 @@ import {useParams} from 'react-router-dom'
 import {useUpdateState} from "../../reducer"
 import ExplorerAPI, {DelegateItem} from "../../ExplorerAPI"
 import InformationCard from "../../component/InformationCard"
-import {AMO, displayAddress, displayMono} from "../../util"
+import {
+  displayAMO,
+  displayAMOLong,
+  displayAddress,
+  displayMono,
+} from "../../util"
 import CollapseTable from "../../component/CollapseTable"
 
 const columns = [
@@ -25,12 +30,12 @@ const columns = [
   {
     key: 'stake',
     header: 'Stake',
-    format: AMO
+    format: displayAMOLong
   },
   {
     key: 'eff_stake',
     header: 'Effective stake',
-    format: AMO
+    format: displayAMOLong
   },
   {
     key: 'power',
@@ -47,7 +52,7 @@ const delegatorColumns = [
   {
     key: 'delegate',
     header: 'Delegate Amount',
-    format: AMO
+    format: displayAMO
   }
 ]
 

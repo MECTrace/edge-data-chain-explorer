@@ -1,6 +1,6 @@
 import {put, select, takeEvery} from 'redux-saga/effects'
 import {newBlockchainState, UPDATE_BLOCKCHAIN} from "./reducer/blockchain"
-import {AMO} from "./util"
+import {displayAMO} from "./util"
 import {newBlocksAction, FETCH_RECENT_BLOCKS} from "./reducer/blocks"
 import ExplorerAPI from "./ExplorerAPI"
 
@@ -21,29 +21,29 @@ const fetchBlockchain = function* () {
       ...data,
       coinsStats: [
         {
-          stringRepresentation: AMO(totalCoins),
+          stringRepresentation: displayAMO(totalCoins),
           percent: 100
         },
         {
-          stringRepresentation: AMO(stakes),
+          stringRepresentation: displayAMO(stakes),
           percent: stakes / totalCoins * 100
         },
         {
-          stringRepresentation: AMO(delegates),
+          stringRepresentation: displayAMO(delegates),
           percent: delegates / totalCoins * 100
         }
       ],
       validatorStats: [
         {
-          stringRepresentation: AMO(effStakes),
+          stringRepresentation: displayAMO(effStakes),
           percent: 100
         },
         {
-          stringRepresentation: AMO(stakeOnline),
+          stringRepresentation: displayAMO(stakeOnline),
           percent: 100
         },
         {
-          stringRepresentation: AMO(stakeOffline),
+          stringRepresentation: displayAMO(stakeOffline),
           percent: 0
         }
       ]

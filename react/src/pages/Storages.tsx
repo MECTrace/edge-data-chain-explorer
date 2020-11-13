@@ -5,7 +5,7 @@ import ExplorerAPI from "../ExplorerAPI"
 import {AccountBalance} from "@material-ui/icons"
 import CollapseTable from "../component/CollapseTable"
 import {useChainId} from "../reducer"
-import {AMO} from "../util"
+import {displayAMO} from "../util"
 import {Link} from "react-router-dom"
 
 const columns = [
@@ -35,14 +35,14 @@ const columns = [
     key: 'registration_fee',
     header: 'Reg. fee',
     format: (registration_fee: string, chainId: string) => {
-      return AMO(registration_fee)
+      return displayAMO(registration_fee)
     }
   },
   {
     key: 'hosting_fee',
     header: 'Hosting fee',
     format: (hosting_fee: string, chainId: string) => {
-      return AMO(hosting_fee)
+      return displayAMO(hosting_fee)
     }
   },
   {
