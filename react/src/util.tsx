@@ -16,12 +16,12 @@ function convert(mote: number | string) {
   return [amo, idx]
 }
 
-export function displayAMO(mote: number | string) {
+export function AMO(mote: number | string) {
   const [amo, idx] = convert(mote)
   return `${Number(amo.toFixed(2)).toLocaleString()} ${UNITS[idx]} AMO`
 }
 
-export function displayAMOLong(s_mote: string) {
+export function displayAmount(s_mote: string) {
   const mote = Number(s_mote)
   const amo = mote / UNIT
   return `${mote.toLocaleString()} mote (${amo < 1 && amo !== 0 ? amo.toFixed(18) : amo.toLocaleString()} AMO)`

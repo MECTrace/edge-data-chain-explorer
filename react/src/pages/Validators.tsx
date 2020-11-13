@@ -5,7 +5,7 @@ import ExplorerAPI from "../ExplorerAPI"
 import {AccountBalance, AllInclusive, CompareArrows} from "@material-ui/icons"
 import CollapseTable from "../component/CollapseTable"
 import {useChainId} from "../reducer"
-import {displayAMO} from "../util"
+import {AMO} from "../util"
 import {Link} from "react-router-dom"
 
 const columns = [
@@ -62,7 +62,7 @@ const Validators = () => {
             const percent = ((Number(v.eff_stake) / stat.total_eff_stakes) * 100).toFixed(2)
             return {
               ...v,
-              eff_stake: `${displayAMO(Number(v.eff_stake))} (${percent}%)`
+              eff_stake: `${AMO(Number(v.eff_stake))} (${percent}%)`
             }
           })
 
@@ -98,21 +98,21 @@ const Validators = () => {
             suffix={`/ blk`}
             color="#62D96B"
           >
-            {displayAMO(stat.avg_blk_incentive)}
+            {AMO(stat.avg_blk_incentive)}
           </StatCard>
           <StatCard
             icon={CompareArrows}
             title={"Total effective stakes"}
             color="#9179F2"
           >
-            {displayAMO(stat.total_eff_stakes)}
+            {AMO(stat.total_eff_stakes)}
           </StatCard>
           <StatCard
             icon={CompareArrows}
             title={"Average effective stake"}
             suffix={`/ validator`}
           >
-            {displayAMO(stat.avg_eff_stake)}
+            {AMO(stat.avg_eff_stake)}
           </StatCard>
         </Grid>
       </StatCard>
