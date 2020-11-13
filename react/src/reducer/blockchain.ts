@@ -41,8 +41,8 @@ export const initialTransactions = {
 }
 
 const initialState = {
-  chainId: 'amo-cherryblossom-01',
-  height: 1,
+  chainId: '',
+  height: 0,
   updated: false,
   blockState: initialBlockState,
   recentTxs: [initialTransactions],

@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react'
-import {Link, useParams} from 'react-router-dom'
+import {useParams} from 'react-router-dom'
 import {useUpdateState} from "../../reducer"
 import ExplorerAPI, {DelegateItem} from "../../ExplorerAPI"
 import InformationCard from "../../component/InformationCard"
