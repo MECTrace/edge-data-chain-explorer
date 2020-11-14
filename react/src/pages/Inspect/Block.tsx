@@ -7,7 +7,7 @@ import InformationCard from "../../component/InformationCard"
 import InfinityTable from "../../component/InfinityTable"
 import {TransactionSchema} from "../../reducer/blockchain"
 import moment from 'moment'
-import {displayAMO, displayResult} from "../../util"
+import {displayResult} from "../../util"
 import {useDispatch} from "react-redux"
 import {replace} from "connected-react-router"
 import useScrollUpdate from "../../hooks/useScrollUpdate"
@@ -92,15 +92,6 @@ const transactionColumns = [
     label: 'Type',
     width: 100,
     flexGrow: 1,
-  },
-  {
-    key: 'fee',
-    label: 'Tx Fee',
-    width: 100,
-    flexGrow: 1,
-    columnData: {
-      format: displayAMO
-    }
   },
   {
     key: 'info',

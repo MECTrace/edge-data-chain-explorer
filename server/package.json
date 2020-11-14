@@ -4,7 +4,7 @@
   "description": "AMO blockchain explorer support server",
   "private": true,
   "scripts": {
-    "start": "nodemon ./bin/server"
+    "start": "node ./bin/server"
   },
   "dependencies": {
     "cors": "^2.8.5",
@@ -14,8 +14,5 @@
     "mysql": "^2.18.1",
     "swagger-jsdoc": "^4.0.0",
     "swagger-ui-express": "^4.1.4"
-  },
-  "devDependencies": {
-    "nodemon": "^2.0.4"
   }
 }

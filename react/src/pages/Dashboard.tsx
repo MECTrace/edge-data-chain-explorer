@@ -6,7 +6,7 @@ import {RootState} from "../reducer"
 import {GraphState} from "../reducer/blockchain"
 import LinearGraph from "../component/LinearGraph"
 import CollapseTable from "../component/CollapseTable"
-import {BlockState, FETCH_RECENT_BLOCKS} from "../reducer/blocks"
+import {BlockState, UPDATE_BLOCKS} from "../reducer/blocks"
 import moment from 'moment'
 import {Link} from "react-router-dom"
 import {Grid} from "@material-ui/core"
@@ -52,7 +52,7 @@ const RecentBlocks = () => {
   const dispatch = useDispatch()
 
   useEffect(() => {
-    dispatch({type: FETCH_RECENT_BLOCKS})
+    dispatch({type: UPDATE_BLOCKS})
   }, [height, dispatch])
 
   return (

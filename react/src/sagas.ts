@@ -1,8 +1,17 @@
+import Axios, {AxiosRequestConfig} from "axios"
 import {put, select, takeEvery} from 'redux-saga/effects'
-import {newBlockchainState, UPDATE_BLOCKCHAIN} from "./reducer/blockchain"
-import {displayAMO} from "./util"
-import {newBlocksAction, FETCH_RECENT_BLOCKS} from "./reducer/blocks"
+import {newBlockchainState, newRecentTxs, UPDATE_BLOCKCHAIN, UPDATE_RECENT_TXS} from "./reducer/blockchain"
+import {AMO} from "./util"
+import {newBlocksAction, UPDATE_BLOCKS} from "./reducer/blocks"
 import ExplorerAPI from "./ExplorerAPI"
+
+const server = 'http://explorer.amolabs.io/api'
+
+const option: AxiosRequestConfig = {
+  headers: {
+    'Cache-Control': 'no-cache'
+  }
+}
 
 const fetchBlockchain = function* () {
   try {
@@ -21,33 +30,43 @@ const fetchBlockchain = function* () {
       ...data,
       coinsStats: [
         {
-          stringRepresentation: displayAMO(totalCoins),
+          stringRepresentation: AMO(totalCoins),
           percent: 100
         },
         {
-          stringRepresentation: displayAMO(stakes),
+          stringRepresentation: AMO(stakes),
           percent: stakes / totalCoins * 100
         },
         {
-          stringRepresentation: displayAMO(delegates),
+          stringRepresentation: AMO(delegates),
           percent: delegates / totalCoins * 100
         }
       ],
       validatorStats: [
         {
-          stringRepresentation: displayAMO(effStakes),
+          stringRepresentation: AMO(effStakes),
           percent: 100
         },
         {
-          stringRepresentation: displayAMO(stakeOnline),
+          stringRepresentation: AMO(stakeOnline),
           percent: 100
         },
         {
-          stringRepresentation: displayAMO(stakeOffline),
+          stringRepresentation: AMO(stakeOffline),
           percent: 0
         }
       ]
     }))
+  } catch (e) {
+
+  }
+}
+
+const fetchRecentTransactions = function* () {
+  try {
+    const chainId = yield select(state => state.blockchain.chainId)
+    const {data} = yield Axios.get(`${server}/chain/${chainId}/txs?top=0&from=0&num=15`, option)
+    yield put(newRecentTxs(data))
   } catch (e) {
 
   }
@@ -87,6 +106,10 @@ export function* syncBlockchain() {
   yield takeEvery(UPDATE_BLOCKCHAIN, fetchBlockchain)
 }
 
+export function* syncRecentTxs() {
+  yield takeEvery(UPDATE_RECENT_TXS, fetchRecentTransactions)
+}
+
 export function* syncRecentBlocks() {
-  yield takeEvery(FETCH_RECENT_BLOCKS, fetchRecentBlocks)
+  yield takeEvery(UPDATE_BLOCKS, fetchRecentBlocks)
 }
