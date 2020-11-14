@@ -1,6 +1,6 @@
 {
-  "name": "explorer3",
-  "version": "0.1.0",
+  "name": "explorer2",
+  "version": "1.0.0",
   "private": true,
   "dependencies": {
     "@material-ui/core": "^4.9.9",
