@@ -44,7 +44,7 @@ const message = (errorType: string, searchText: string) => {
 
 const NotFound = () => {
   const state = window.history.state.state
-  const classes = useStyles()
+  const styles = useStyles()
 
   const errorType = state?.type || 'NONE'
   const searchText = state?.search || ''
@@ -55,9 +55,9 @@ const NotFound = () => {
       lg={12}
     >
       <div
-        className={classes.root}
+        className={styles.root}
       >
-        <Warning className={classes.icon}/>
+        <Warning className={styles.icon}/>
         <h1>404 Not found</h1>
         {message(errorType, searchText)}
       </div>

@@ -17,18 +17,19 @@ import {
   useMediaQuery
 } from "@material-ui/core"
 import {makeStyles, ThemeProvider} from "@material-ui/core/styles"
-import {useDispatch, useSelector} from "react-redux"
-import {setNetwork, UPDATE_BLOCKCHAIN} from "./reducer/blockchain"
-import Dashboard from "./pages/Dashboard"
+import {useSelector, useDispatch} from "react-redux"
 import {Search} from "@material-ui/icons"
-import {Redirect, Route, RouteProps, Switch} from "react-router-dom"
+import {Route, RouteProps, Switch} from "react-router-dom"
 import {push, replace} from "connected-react-router"
-import Transactions from "./pages/Transactions"
-import {RootState} from "./reducer"
-import Blocks from "./pages/Blocks"
+import {RootState, useChainId, usePath, STORE_NETWORKS} from "./reducer"
+import {setNetwork, UPDATE_BLOCKCHAIN} from "./reducer/blockchain"
+import ExplorerAPI from "./ExplorerAPI"
+import Dashboard from "./pages/Dashboard"
 import Inspect from "./pages/Inspect"
+import Transactions from "./pages/Transactions"
+import Blocks from "./pages/Blocks"
 import Validators from "./pages/Validators"
-import Nodes from "./pages/Nodes"
+import Storages from "./pages/Storages"
 import Footer from "./component/Footer"
 
 const useStyles = makeStyles((theme) => ({
@@ -80,69 +81,43 @@ const routers: RouteProps[] = [
     component: Validators
   },
   {
-    path: '/:chainId/nodes',
-    component: Nodes
+    path: '/:chainId/storages',
+    component: Storages
   },
 ]
 
-const urls = routers.map((r) => (r.path as string).replace(/\/:chainId\/?/, '/'))
+const pages = routers.map((r) => { const [, , page = ''] = (r.path as string).split('/'); return page})
 
-const tabList = [
-  'dashboard',
-  'inspect',
-  'blocks',
-  'transactions',
-  'validators',
-  'nodes',
-]
-
-const supportedNetworks = [
-  'amo-cherryblossom-01',
-  'amo-testnet-200330',
-  'amo-testnet-200706'
-]
-
-const networkMap = new Set(supportedNetworks)
+const tabs = ['dashboard', ...pages.slice(1)]
 
 const ExplorerBar = () => {
-  const classes = useStyles()
+  const styles = useStyles()
   const [tab, setTab] = useState<number>(0)
   const [searchText, setSearchText] = useState('')
   const isDesktop = useMediaQuery('(min-width: 1280px)')
 
   const dispatch = useDispatch()
-  const chainId = useSelector<RootState, string>(state =>
-                                                 state.blockchain.chainId)
-  const path = useSelector<RootState, string>(state =>
-                                              state.router.location.pathname)
-
-  const handleTabChange = (event: any, newValue: any) => {
-    dispatch(push(`/${chainId}${urls[newValue]}`))
-    setTab(newValue)
-  }
+  const chainId = useChainId()
+  const path = usePath()
+  const networks = useSelector<RootState, string[]>(state => 
+    state.main.networks
+  )
 
   useEffect(() => {
-    const [, newChainId, page = ''] = path.split("/")
+    const [, , page = ''] = path.split("/")
 
-    if (!networkMap.has(newChainId)) {
-      dispatch(replace(`/${supportedNetworks[0]}`))
-      return
-    }
-
-    if (chainId !== newChainId) {
-      dispatch(setNetwork(newChainId))
-    }
-
-    const slashPage = "/" + page
-    for (let i = 0; i < urls.length; i += 1) {
-      if (urls[i] === slashPage) {
+    for (let i = 0; i < pages.length; i += 1) {
+      if (pages[i] === page) {
         setTab(i)
         return
       }
     }
+  }, [path])
 
-    dispatch(replace(`/${supportedNetworks[0]}`))
-  }, [path, dispatch, chainId])
+  const onTabChange = (event: any, newTab: any) => {
+    dispatch(push(`/${chainId}/${pages[newTab]}`))
+    setTab(newTab)
+  }
 
   const onNetworkChange = (e: React.ChangeEvent<{ name?: string; value: unknown }>,) => {
     dispatch(push(`/${e.target.value}`))
@@ -173,29 +148,29 @@ const ExplorerBar = () => {
     <AppBar position="fixed">
       <Toolbar>
         <img src={require('./assets/amo_white.png')} alt="logo" style={{
-          height: '30px',
+          height: '36px',
           marginRight: '12px'
         }}/>
         <Hidden only={['xs', 'sm']}>
-          <Typography variant={"h6"} className={classes.title}>
+          <Typography variant={"h5"} className={styles.title}>
             AMO Blockchain Explorer
           </Typography>
         </Hidden>
         <ThemeProvider theme={darkTheme}>
-          <FormControl className={classes.searchForm}>
+          <FormControl className={styles.searchForm}>
             <InputLabel id="network-select-label">
               Network
             </InputLabel>
             <Select
               value={chainId}
               labelId="network-select-label"
-              className={classes.mr2}
+              className={styles.mr2}
               onChange={onNetworkChange}
               style={{
                 width: '40%'
               }}
             >
-              {supportedNetworks.map((v, i) => (
+              {networks.map((v, i) => (
                 <MenuItem value={v} key={i}>{v}</MenuItem>
               ))}
             </Select>
@@ -215,22 +190,24 @@ const ExplorerBar = () => {
                   </InputAdornment>
                 )
               }}
+              disabled={chainId.length === 0}
             />
           </FormControl>
         </ThemeProvider>
       </Toolbar>
       <Tabs
         value={tab}
-        onChange={handleTabChange}
+        onChange={onTabChange}
         aria-label="main tabs"
         variant={isDesktop ? 'standard' : 'scrollable'}
         scrollButtons="on"
         centered={isDesktop}
       >
-        {tabList.map((t, i) => (
+        {tabs.map((t, i) => (
           <Tab
             key={i}
             label={t}
+            disabled={chainId.length === 0}
           />
         ))}
       </Tabs>
@@ -240,14 +217,41 @@ const ExplorerBar = () => {
 
 function App() {
   const dispatch = useDispatch()
-
-  const path = useSelector<RootState, string>(state => state.router.location.pathname)
-  const chainId = useSelector<RootState, string>(state => state.blockchain.chainId)
+  const chainId = useChainId()
+  const path = usePath()
+  const networks = useSelector<RootState, string[]>(state => 
+    state.main.networks
+  )
 
   useEffect(() => {
+    ExplorerAPI.fetchNetworks()
+    .then(({data}) => {
+      const _networks = data.map(n => n.chain_id)
+      dispatch({type: STORE_NETWORKS, payload: _networks})
+    })
+  }, [dispatch])
+
+  useEffect(() => {
+    const [, newChainId = '', page = ''] = path.split("/")
+
+    if (!(networks.includes(newChainId))) {
+      if (networks.length > 0) {
+        dispatch(replace(`/${networks[0]}`))
+      }
+      return
+    }
+
+    if (chainId !== newChainId) {
+      dispatch(setNetwork(newChainId))
+    }
+
+    if (!(pages.includes(page))) {
+      // fall back to default tab
+      dispatch(replace(`/${newChainId}/`))
+    }
+
     const updateBlockchain = () => {
-      const matchedChainId = path.split('/')[1]
-      if (matchedChainId === chainId || matchedChainId === '') {
+      if (newChainId === chainId || newChainId === '') {
         dispatch({type: UPDATE_BLOCKCHAIN})
       }
     }
@@ -258,7 +262,7 @@ function App() {
     }, 3000)
 
     return () => clearInterval(handler)
-  }, [dispatch, path, chainId])
+  }, [dispatch, networks, path, chainId])
 
   return (
     <div>
@@ -291,9 +295,6 @@ function App() {
                   {routers.map((r, i) => (
                     <Route key={i} {...r} />
                   ))}
-                  <Route path="/" exact={true}>
-                    <Redirect to={`/${supportedNetworks[0]}`}/>
-                  </Route>
                 </Switch>
               </Grid>
             </Grid>

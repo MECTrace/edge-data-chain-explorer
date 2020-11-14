@@ -5,7 +5,22 @@ import {connectRouter} from 'connected-react-router'
 import {History} from 'history'
 import {shallowEqual, useSelector} from "react-redux"
 
+// TODO: make separate reducer
+export const STORE_NETWORKS = 'STORE_NETWORKS'
+const initialStateMain = {
+  networks: []
+}
+export type StateMain = typeof initialStateMain
+
 const rootReducer = (history: History<History.LocationState>) => combineReducers({
+  main: (state: StateMain = initialStateMain, action) => {
+    switch (action.type) {
+      case STORE_NETWORKS:
+        return {...state, networks: action.payload}
+      default:
+        return state
+    }
+  },
   blockchain,
   blocks,
   router: connectRouter(history)
@@ -22,6 +37,10 @@ type UpdateState = {
 
 export const useChainId = () => {
   return useSelector<RootState, string>(state => state.blockchain.chainId, shallowEqual)
+}
+
+export const usePath = () => {
+  return useSelector<RootState, string>((state: RootState) => state.router.location.pathname)
 }
 
 export const useUpdateState = () => {

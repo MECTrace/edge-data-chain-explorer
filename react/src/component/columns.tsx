@@ -1,5 +1,5 @@
 import {Link} from "react-router-dom"
-import {displayAddress, displayResult} from "../util"
+import {displayAddress, displayResult, displayAMO} from "../util"
 import React from "react"
 
 export const transactionColumns = [
@@ -53,6 +53,14 @@ export const transactionColumns = [
     label: 'Type',
     width: 100,
     flexGrow: 1
+  },
+  {
+    key: 'fee',
+    label: 'Tx Fee',
+    width: 100,
+    columnData: {
+      format: displayAMO
+    }
   },
   {
     key: 'info',
