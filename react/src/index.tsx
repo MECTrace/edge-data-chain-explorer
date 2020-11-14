@@ -9,7 +9,7 @@ import reducer from './reducer'
 import {composeWithDevTools} from "redux-devtools-extension"
 import createSagaMiddleware from 'redux-saga'
 import {createMuiTheme, CssBaseline, ThemeProvider} from "@material-ui/core"
-import {syncBlockchain, syncRecentBlocks, syncRecentTxs} from "./sagas"
+import {syncBlockchain, syncRecentBlocks} from "./sagas"
 import {createBrowserHistory} from 'history'
 import {ConnectedRouter, routerMiddleware} from "connected-react-router"
 
@@ -26,7 +26,7 @@ const store = (() => {
 
   const enhancer = process.env.NODE_ENV === 'production' ?
     compose(applyMiddleware(...middleware)) :
-    composeWithDevTools(
+    composeWithDevTools({trace: true, traceLimit: 100})(
       applyMiddleware(...middleware)
     )
 
@@ -38,10 +38,6 @@ const store = (() => {
 
   sagaMiddleware.run(
     syncBlockchain,
-  )
-
-  sagaMiddleware.run(
-    syncRecentTxs,
   )
 
   return store

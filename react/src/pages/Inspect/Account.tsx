@@ -2,7 +2,7 @@ import React, {useCallback, useState} from 'react'
 import InformationCard from "../../component/InformationCard"
 import ExplorerAPI from "../../ExplorerAPI"
 import {useParams} from 'react-router-dom'
-import {displayAmount} from "../../util"
+import {displayAMOLong} from "../../util"
 import {TransactionSchema} from "../../reducer/blockchain"
 import {AxiosError} from "axios"
 import InfinityTable from "../../component/InfinityTable"
@@ -25,17 +25,17 @@ const columns = [
   {
     key: 'balance',
     header: 'Balance',
-    format: displayAmount
+    format: displayAMOLong
   },
   {
     key: 'stake',
     header: 'Stake',
-    format: displayAmount
+    format: displayAMOLong
   },
   {
     key: 'delegate',
     header: 'Delegate',
-    format: displayAmount
+    format: displayAMOLong
   }
 ]
 
