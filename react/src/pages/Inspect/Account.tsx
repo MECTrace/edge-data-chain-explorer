@@ -2,7 +2,7 @@ import React, {useCallback, useState} from 'react'
 import InformationCard from "../../component/InformationCard"
 import ExplorerAPI from "../../ExplorerAPI"
 import {useParams} from 'react-router-dom'
-import {displayAMOLong} from "../../util"
+import {displayAmount} from "../../util"
 import {TransactionSchema} from "../../reducer/blockchain"
 import {AxiosError} from "axios"
 import InfinityTable from "../../component/InfinityTable"
@@ -25,24 +25,24 @@ const columns = [
   {
     key: 'balance',
     header: 'Balance',
-    format: displayAMOLong
+    format: displayAmount
   },
   {
     key: 'stake',
     header: 'Stake',
-    format: displayAMOLong
+    format: displayAmount
   },
   {
     key: 'delegate',
     header: 'Delegate',
-    format: displayAMOLong
+    format: displayAmount
   }
 ]
 
 const Account = () => {
   const {address} = useParams()
 
-  const [account, setAccount] = useState<AccountInfo>({
+  const [account, setAccount] = useState<AccountSchema>({
     address: address as string,
     balance: '0',
     chain_id: '',

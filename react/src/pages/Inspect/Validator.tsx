@@ -1,14 +1,9 @@
 import React, {useEffect, useState} from 'react'
-import {useParams} from 'react-router-dom'
+import {Link, useParams} from 'react-router-dom'
 import {useUpdateState} from "../../reducer"
 import ExplorerAPI, {DelegateItem} from "../../ExplorerAPI"
 import InformationCard from "../../component/InformationCard"
-import {
-  displayAMO,
-  displayAMOLong,
-  displayAddress,
-  displayMono,
-} from "../../util"
+import {AMO, displayAddress, displayMono} from "../../util"
 import CollapseTable from "../../component/CollapseTable"
 
 const columns = [
@@ -30,12 +25,12 @@ const columns = [
   {
     key: 'stake',
     header: 'Stake',
-    format: displayAMOLong
+    format: AMO
   },
   {
     key: 'eff_stake',
     header: 'Effective stake',
-    format: displayAMOLong
+    format: AMO
   },
   {
     key: 'power',
@@ -52,7 +47,7 @@ const delegatorColumns = [
   {
     key: 'delegate',
     header: 'Delegate Amount',
-    format: displayAMO
+    format: AMO
   }
 ]
 

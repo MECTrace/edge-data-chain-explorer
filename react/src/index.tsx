@@ -9,7 +9,7 @@ import reducer from './reducer'
 import {composeWithDevTools} from "redux-devtools-extension"
 import createSagaMiddleware from 'redux-saga'
 import {createMuiTheme, CssBaseline, ThemeProvider} from "@material-ui/core"
-import {syncBlockchain, syncRecentBlocks} from "./sagas"
+import {syncBlockchain, syncRecentBlocks, syncRecentTxs} from "./sagas"
 import {createBrowserHistory} from 'history'
 import {ConnectedRouter, routerMiddleware} from "connected-react-router"
 
@@ -26,7 +26,7 @@ const store = (() => {
 
   const enhancer = process.env.NODE_ENV === 'production' ?
     compose(applyMiddleware(...middleware)) :
-    composeWithDevTools({trace: true, traceLimit: 100})(
+    composeWithDevTools(
       applyMiddleware(...middleware)
     )
 
@@ -40,6 +40,10 @@ const store = (() => {
     syncBlockchain,
   )
 
+  sagaMiddleware.run(
+    syncRecentTxs,
+  )
+
   return store
 })()
 
@@ -50,7 +54,7 @@ const darkTheme = createMuiTheme({
 })
 
 ReactDOM.render(
-  <React.Fragment>
+  <React.StrictMode>
     <Provider store={store}>
       <CssBaseline/>
       <ThemeProvider theme={darkTheme}>
@@ -59,7 +63,7 @@ ReactDOM.render(
         </ConnectedRouter>
       </ThemeProvider>
     </Provider>
-  </React.Fragment>,
+  </React.StrictMode>,
   document.getElementById('root')
 )
 

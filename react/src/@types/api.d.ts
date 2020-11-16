@@ -1,8 +1,4 @@
-type Network = {
-  chain_id: string,
-}
-
-type AccountInfo = {
+type AccountSchema = {
   chain_id: string,
   address: string,
   balance: string,
@@ -70,14 +66,16 @@ type ValidatorStat = {
   num_validators: number
 }
 
-type StorageInfo = {
-  chain_id: string,
-  storage_id: number,
-  url: string,
-  registration_fee: string,
-  hosting_fee: string,
-  owner: string,
-  active: boolean,
+type NodeInfo = {
+  node_id: string,
+  moniker: string,
+  val_addr: string,
+  latest_block_height: number,
+  latest_block_time: string,
+  catching_up: number,
+  elapsed: number,
+  timestamp: string,
+  uptime: number,
 }
 
 // https://github.com/amolabs/docs/blob/master/protocol.md#top-level-data

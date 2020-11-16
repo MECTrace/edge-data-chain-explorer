@@ -92,7 +92,7 @@ const cardSize: { [k: string]: Partial<Record<Breakpoint, boolean | GridSize>> }
 }
 
 const StatCard = (props: PropsWithChildren<Props>) => {
-  const styles = useStyles()
+  const classes = useStyles()
   const size = props.size || 'small'
   const color = '#182026'
   const iconTheme: React.CSSProperties = {
@@ -122,20 +122,20 @@ const StatCard = (props: PropsWithChildren<Props>) => {
         }
       }}
     >
-      <div className={styles.root}>
+      <div className={classes.root}>
         <div
-          className={styles.header}
+          className={classes.header}
         >
           {
             Icon && (
-              <div className={styles.icon} style={iconTheme}>
+              <div className={classes.icon} style={iconTheme}>
                 <Icon/>
               </div>
             )
           }
           {
             title && (
-              <h1 className={styles.title} style={{
+              <h1 className={classes.title} style={{
                 fontSize: size === 'small' ? '14px' : '22px',
                 textAlign: titleAlign || 'right'
               }}>
@@ -148,7 +148,7 @@ const StatCard = (props: PropsWithChildren<Props>) => {
               <Divider style={{marginTop: '5px'}}/>
             )
           }
-          <h1 className={styles.stat} style={{textAlign: bodyAlign || 'right'}}>
+          <h1 className={classes.stat} style={{textAlign: bodyAlign || 'right'}}>
             {props.children}
             {props.suffix && <small>&nbsp;{props.suffix}</small>}
           </h1>

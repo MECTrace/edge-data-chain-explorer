@@ -5,11 +5,7 @@ import {initialTransactions, TransactionSchema} from "../../reducer/blockchain"
 import ExplorerAPI from "../../ExplorerAPI"
 import {useUpdateState} from "../../reducer"
 import {
-  displayAddress,
-  displayAMO,
-  displayAMOLong,
-  displayResult,
-  displayMono,
+  AMO, displayAddress, displayAmount, displayResult, displayMono
 } from "../../util"
 import {Grid, Link as UrlLink} from "@material-ui/core"
 import {useDispatch} from "react-redux"
@@ -25,7 +21,7 @@ const payloadColumns: StringMap = {
     {
       key: 'amount',
       header: 'Amount',
-      format: displayAMOLong
+      format: displayAmount
     }
   ],
   register: [
@@ -49,7 +45,7 @@ const payloadColumns: StringMap = {
     {
       key: 'amount',
       header: 'Amount',
-      format: displayAMOLong
+      format: displayAmount
     }
   ],
   issue: [
@@ -64,7 +60,7 @@ const payloadColumns: StringMap = {
     {
       key: 'amount',
       header: 'Amount',
-      format: displayAMOLong
+      format: displayAmount
     }
   ],
   delegate: [
@@ -76,7 +72,7 @@ const payloadColumns: StringMap = {
     {
       key: 'amount',
       header: 'Amount',
-      format: displayAMOLong
+      format: displayAmount
     }
   ],
   setup: [
@@ -98,12 +94,12 @@ const payloadColumns: StringMap = {
     {
       key: 'registration_fee',
       header: 'Registration fee',
-      format: displayAMOLong,
+      format: displayAmount,
     },
     {
       key: 'hosting_fee',
       header: 'Hosting fee',
-      format: displayAMOLong,
+      format: displayAmount,
     }
   ],
   propose: [], // TODO
@@ -111,7 +107,7 @@ const payloadColumns: StringMap = {
     {
       key: 'amount',
       header: 'Amount',
-      format: displayAMOLong
+      format: displayAmount
     }
   ],
   close: [
@@ -133,14 +129,14 @@ const payloadColumns: StringMap = {
     {
       key: 'amount',
       header: 'Amount',
-      format: displayAMOLong
+      format: displayAmount
     }
   ],
   withdraw: [
     {
       key: 'amount',
       header: 'Amount',
-      format: displayAMOLong
+      format: displayAmount
     }
   ],
   vote: [
@@ -165,7 +161,7 @@ const payloadColumns: StringMap = {
     {
       key: 'payment',
       header: 'Payment',
-      format: displayAMOLong
+      format: displayAmount
     }
   ],
   grant: [
@@ -238,7 +234,7 @@ const columns = [
   {
     key: 'fee',
     header: 'Fee',
-    format: displayAMO
+    format: AMO
   },
   {
     key: 'tx_bytes',

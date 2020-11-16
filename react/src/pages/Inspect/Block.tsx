@@ -1,13 +1,13 @@
 import React, {useCallback, useEffect, useState} from 'react'
 import {Link, useParams} from 'react-router-dom'
-import {BlockInfo, initialBlock} from "../../reducer/blocks"
+import {BlockState, initialBlock} from "../../reducer/blocks"
 import {useChainId} from "../../reducer"
 import ExplorerAPI from "../../ExplorerAPI"
 import InformationCard from "../../component/InformationCard"
 import InfinityTable from "../../component/InfinityTable"
 import {TransactionSchema} from "../../reducer/blockchain"
 import moment from 'moment'
-import {displayAMO, displayResult} from "../../util"
+import {displayResult} from "../../util"
 import {useDispatch} from "react-redux"
 import {replace} from "connected-react-router"
 import useScrollUpdate from "../../hooks/useScrollUpdate"
@@ -40,7 +40,7 @@ const columns = [
   {
     key: 'time',
     header: 'Time',
-    format: (time: string, chainId: string, data: BlockInfo) => {
+    format: (time: string, chainId: string, data: BlockState) => {
       return `${moment(time).fromNow()} (${moment(time).format("YYYY-MM-DD HH:mm:ss.SSS ZZ")}) (+${data.interval.toFixed(3)} sec)`
     }
   },
@@ -94,15 +94,6 @@ const transactionColumns = [
     flexGrow: 1,
   },
   {
-    key: 'fee',
-    label: 'Tx Fee',
-    width: 100,
-    flexGrow: 1,
-    columnData: {
-      format: displayAMO
-    }
-  },
-  {
     key: 'info',
     label: 'Result',
     width: 100,
@@ -116,7 +107,7 @@ const transactionColumns = [
 const Block = () => {
   const {height} = useParams()
 
-  const [block, setBlock] = useState<BlockInfo>(initialBlock)
+  const [block, setBlock] = useState<BlockState>(initialBlock)
   const chainId = useChainId()
 
   const [blockLoading, setBlockLoading] = useState(true)
