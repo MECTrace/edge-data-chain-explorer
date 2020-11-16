@@ -35,6 +35,15 @@ const stat = require('../models/stat');
  *         description: quoted decimal number
  */
 
+function dateToStr(target) {
+  return target.getUTCFullYear() + '-' 
+        + (target.getUTCMonth()+1) + '-'
+        + target.getUTCDate() + ' '
+        + target.getUTCHours() +':'
+        + target.getUTCMinutes() + ':'
+        + target.getUTCSeconds() + 'Z';
+}
+
 /**
  * @swagger
  * /chain/{chain_id}/validators:
@@ -82,9 +91,10 @@ router.get('/', function(req, res) {
         res.send(err);
       });
   } else {
-    var from = req.query.from || 0;
-    var num = req.query.num || 20;
-    validator.getList(chain_id, from, num)
+    const range = req.query.range || 60; // seconds
+    const to = dateToStr(new Date());
+    const from = dateToStr(new Date(Date.parse(to) - range * 1000));
+    validator.getList(chain_id, from, to)
       .then((rows) => {
         if (rows.length > 0) {
           res.status(200);
@@ -123,7 +133,11 @@ router.get('/', function(req, res) {
  */
 router.get('/:address([a-fA-F0-9]+)', function(req, res) {
   const chain_id = res.locals.chain_id;
-  validator.getOne(chain_id, req.params.address)
+  const address = req.params.address;
+  const range = req.query.range || 60; // seconds
+  const to = dateToStr(new Date());
+  const from = dateToStr(new Date(Date.parse(to) - range * 1000));
+  validator.getOne(chain_id, address, from, to)
     .then((row) => {
       if (row) {
         res.status(200);
