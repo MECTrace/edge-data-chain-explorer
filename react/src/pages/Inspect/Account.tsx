@@ -42,7 +42,7 @@ const columns = [
 const Account = () => {
   const {address} = useParams()
 
-  const [account, setAccount] = useState<AccountSchema>({
+  const [account, setAccount] = useState<AccountInfo>({
     address: address as string,
     balance: '0',
     chain_id: '',

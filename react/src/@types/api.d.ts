@@ -2,7 +2,7 @@ type Network = {
   chain_id: string,
 }
 
-type AccountSchema = {
+type AccountInfo = {
   chain_id: string,
   address: string,
   balance: string,
