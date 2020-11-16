@@ -25,6 +25,10 @@ const stat = require('../models/stat');
  *       eff_stake:
  *         type: string
  *         description: quoted decimal number
+ *       node_id:
+ *         type: string
+ *       uptime:
+ *         type: number
  *   DelegatorInfo:
  *     type: object
  *     properties:
@@ -49,18 +53,12 @@ function dateToStr(target) {
  * /chain/{chain_id}/validators:
  *   parameters:
  *     - $ref: '#/definitions/ChainId'
- *     - name: from
+ *     - name: range
  *       in: query
- *       description: offset from the result
+ *       description: range to query (unit seconds)
  *       schema:
  *         type: integer
- *         default: 0
- *     - name: num
- *       in: query
- *       description: number of items to retrieve
- *       schema:
- *         type: integer
- *         default: 20
+ *         default: 60
  *   get:
  *     tags:
  *       - validators
@@ -117,6 +115,12 @@ router.get('/', function(req, res) {
  *   parameters:
  *     - $ref: '#/definitions/ChainId'
  *     - $ref: '#/definitions/Address'
+ *     - name: range
+ *       in: query
+ *       description: range to query (unit seconds)
+ *       schema:
+ *         type: integer
+ *         default: 60
  *   get:
  *     tags:
  *       - validators
