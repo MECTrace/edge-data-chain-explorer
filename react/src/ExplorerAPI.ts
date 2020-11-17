@@ -1,5 +1,5 @@
 import Axios, {AxiosResponse} from "axios"
-import {BlockInfo} from "./reducer/blocks"
+import {BlockState} from "./reducer/blocks"
 import {TransactionSchema} from "./reducer/blockchain"
 
 const defaultURL = "https://explorer.amolabs.io/api"
@@ -15,7 +15,7 @@ const fetchNetworks = (): Result<Network[]> => {
     .get(`/networks`)
 }
 
-const fetchBlocks = (chainId: string, blockHeight: number, size: number = 20): Result<BlockInfo[]> => {
+const fetchBlocks = (chainId: string, blockHeight: number, size: number = 20): Result<BlockState[]> => {
   return client
     .get(`/chain/${chainId}/blocks?anchor=${blockHeight}&num=${size}&order=desc`)
 }
@@ -30,7 +30,7 @@ const fetchTransactions = (chainId: string, top: number, from: number, size: num
     .get(`/chain/${chainId}/txs?top=${top}&from=${from}&num=${size}`)
 }
 
-const fetchBlock = (chainId: string, height: number): Result<BlockInfo> => {
+const fetchBlock = (chainId: string, height: number): Result<BlockState> => {
   return client
     .get(`/chain/${chainId}/blocks/${height}`)
 }
@@ -66,7 +66,7 @@ const fetchDelegators = (chainId: string, address: string, from: number, size: n
     .get(`/chain/${chainId}/validators/${address}/delegators`)
 }
 
-const fetchAccount = (chainId: string, address: string): Result<AccountInfo> => {
+const fetchAccount = (chainId: string, address: string): Result<AccountSchema> => {
   return client
     .get(`/chain/${chainId}/accounts/${address}`)
 }
@@ -111,13 +111,6 @@ const fetchStorage = (chainId: string, storageId: number): Result<StorageInfo> =
     .get(`chain/${chainId}/storages/${storageId}`)
 }
 
-const fetchAccountIncentives = (
-  chainId: string, address: string, from: number, num: number):
-    Result<Incentive[]> => {
-  return client
-    .get(`chain/${chainId}/accounts/${address}/incentives?from=${from}&num=${num}`)
-}
-
 export default {
   fetchNetworks,
   fetchBlocks,
@@ -138,5 +131,4 @@ export default {
   fetchDraft,
   fetchStorages,
   fetchStorage,
-  fetchAccountIncentives,
 }

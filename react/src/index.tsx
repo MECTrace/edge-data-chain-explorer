@@ -50,7 +50,7 @@ const darkTheme = createMuiTheme({
 })
 
 ReactDOM.render(
-  <React.Fragment>
+  <React.StrictMode>
     <Provider store={store}>
       <CssBaseline/>
       <ThemeProvider theme={darkTheme}>
@@ -59,7 +59,7 @@ ReactDOM.render(
         </ConnectedRouter>
       </ThemeProvider>
     </Provider>
-  </React.Fragment>,
+  </React.StrictMode>,
   document.getElementById('root')
 )
 

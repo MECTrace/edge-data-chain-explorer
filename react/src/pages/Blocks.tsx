@@ -1,5 +1,5 @@
 import React, {useCallback, useEffect, useMemo, useState} from 'react'
-import {BlockInfo} from "../reducer/blocks"
+import {BlockState} from "../reducer/blocks"
 import {useChainId} from "../reducer"
 import {Grid} from "@material-ui/core"
 import InfinityTable from "../component/InfinityTable"
@@ -33,7 +33,7 @@ const columns = [
     width: 100,
     flexGrow: 5,
     columnData: {
-      format: (time: string, chainId: string, data: BlockInfo) => {
+      format: (time: string, chainId: string, data: BlockState) => {
         return (
           `${moment(time).format("YYYY-MM-DD HH:mm:ss.SSS ZZ")} (+${data.interval.toFixed(3)} sec)`
         )
@@ -168,14 +168,14 @@ const Blocks = () => {
 
     return null
   }, [])
-  const [blocks, loading, onScroll] = useScrollUpdate<BlockInfo>(fetchBlocks, ref)
+  const [blocks, loading, onScroll] = useScrollUpdate<BlockState>(fetchBlocks, ref)
 
   return (
     <>
       <BlocksStatView
         setRef={setRef}
       />
-      <InfinityTable<BlockInfo>
+      <InfinityTable<BlockState>
         onScroll={onScroll}
         columns={columns}
         rowKey={'hash'}
