@@ -78,19 +78,38 @@ export const incentiveColumns = [
     key: 'height',
     label: 'Height',
     width: 100,
-    columnData: {
-      format: (height: number, chainId: string) => {
-        return (
-          <Link to={`/${chainId}/inspect/block/${height}`}>
-            {height}
-          </Link>
-        )
-      }
+    format: (height: number, chainId: string) => {
+      return (
+        <Link to={`/${chainId}/inspect/block/${height}`}>
+          {height}
+        </Link>
+      )
     }
   },
   {
     key: 'amount',
     label: 'Incentive',
+    width: 100,
+    format: displayAMO
+  },
+]
+
+export const penaltyColumns = [
+  {
+    key: 'height',
+    label: 'Height',
+    width: 100,
+    format: (height: number, chainId: string) => {
+      return (
+        <Link to={`/${chainId}/inspect/block/${height}`}>
+          {height}
+        </Link>
+      )
+    }
+  },
+  {
+    key: 'amount',
+    label: 'Penalty',
     width: 100,
     columnData: {
       format: displayAMO

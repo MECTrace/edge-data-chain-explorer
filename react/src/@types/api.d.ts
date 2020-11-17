@@ -86,6 +86,12 @@ type Incentive = {
   amount: string,
 }
 
+type Penalty = {
+  height: number,
+  address?: string,
+  amount: string,
+}
+
 // https://github.com/amolabs/docs/blob/master/protocol.md#top-level-data
 interface DraftConfig {
   max_validators?: number
