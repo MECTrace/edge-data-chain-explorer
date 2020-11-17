@@ -45,8 +45,8 @@ const infoColumns = [
 
 const Account = () => {
   const chainId = useChainId()
+  const dispatch = useDispatch()
   const {address} = useParams()
-
   const [account, setAccount] = useState<AccountInfo>({
     address: address as string,
     balance: '0',
@@ -58,28 +58,33 @@ const Account = () => {
     val_power: '0',
     val_pubkey: ''
   })
+  const [statLoading, setStatLoading] = useState(true)
+
+  const [tab, setTab] = useState<number>(0)
   const [txs, setTxs] = useState<TransactionSchema[]>([])
   const [incentives, setIncentives] = useState<Incentive[]>([])
   const [penalties, setPenalties] = useState<Penalty[]>([])
-  const [hasMoreTxs, setHasMoreTxs] = useState<boolean>(true)
-  const [hasMoreIncentives, setHasMoreIncentives] = useState<boolean>(true)
-  const [hasMorePenalties, setHasMorePenalties] = useState<boolean>(true)
-  const [statLoading, setStatLoading] = useState(true)
-  const [tab, setTab] = useState<number>(0)
-  const dispatch = useDispatch()
+  const [hasMoreTxs, setHasMoreTxs] = useState<boolean>(false)
+  const [hasMoreIncentives, setHasMoreIncentives] = useState<boolean>(false)
+  const [hasMorePenalties, setHasMorePenalties] = useState<boolean>(false)
 
   const handleTabChange = (e: React.ChangeEvent<{}>, newValue: number) => {
     setTab(newValue)
   }
 
   useEffect(() => {
+    setTxs([])
+    setIncentives([])
+    setPenalties([])
     if (chainId && address) {
       ExplorerAPI
         .fetchAccount(chainId, address as string)
         .then(({data}) => {
           setAccount(data)
-          setTxs([])
           setStatLoading(false)
+          setHasMoreTxs(true)
+          setHasMoreIncentives(true)
+          setHasMorePenalties(true)
         })
         .catch((e: AxiosError) => {
           dispatch(replace(`/${chainId}/inspect/404`, {type: 'ACCOUNT', search: address}))
@@ -89,48 +94,39 @@ const Account = () => {
   }, [chainId, address, dispatch])
 
   const fetchAccountTransactions = async (from: number, num: number) => {
-    ExplorerAPI
-      .fetchAccountTransactions(chainId, address, 0, from, num)
-      .then(({data}) => {
-        if (data.length > 0) {
-          setTxs(txs.concat(data))
-        } else {
-          setHasMoreTxs(false)
-        }
-      })
-      .catch((e: AxiosError) => {
+    if (chainId && address && hasMoreTxs) {
+      const {data} = await ExplorerAPI
+        .fetchAccountTransactions(chainId, address, 0, from, num)
+      if (data.length > 0) {
+        setTxs(txs.concat(data))
+      } else {
         setHasMoreTxs(false)
-      })
+      }
+    }
   }
 
   const fetchAccountIncentives = async (from: number, num: number) => {
-    ExplorerAPI
-      .fetchAccountIncentives(chainId, address, 0, from, num)
-      .then(({data}) => {
-        if (data.length > 0) {
-          setIncentives(incentives.concat(data))
-        } else {
-          setHasMoreIncentives(false)
-        }
-      })
-      .catch((e:AxiosError) => {
+    if (chainId && address && hasMoreIncentives) {
+      const {data} = await ExplorerAPI
+        .fetchAccountIncentives(chainId, address, 0, from, num)
+      if (data.length > 0) {
+        setIncentives(incentives.concat(data))
+      } else {
         setHasMoreIncentives(false)
-      })
+      }
+    }
   }
 
   const fetchAccountPenalties = async (from: number, num: number) => {
-    ExplorerAPI
-      .fetchAccountPenalties(chainId, address, 0, from, num)
-      .then(({data}) => {
-        if (data.length > 0) {
-          setPenalties(penalties.concat(data))
-        } else {
-          setHasMorePenalties(false)
-        }
-      })
-      .catch((e:AxiosError) => {
+    if (chainId && address && hasMorePenalties) {
+      const {data} = await ExplorerAPI
+        .fetchAccountPenalties(chainId, address, 0, from, num)
+      if (data.length > 0) {
+        setPenalties(penalties.concat(data))
+      } else {
         setHasMorePenalties(false)
-      })
+      }
+    }
   }
 
   return (

@@ -81,13 +81,12 @@ type InfiniteTableProps<T> = {
   columns: Column[]
   // indicator whether there are more rows to load,
   // should be set false from outside
-  hasMore?: boolean
+  hasMore: boolean
   // Callback function responsible for loading the next page of items.
   loadMoreRows: (from: number, num: number) => Promise<any>,
 }
 
 function InfiniteTable<T>(props: InfiniteTableProps<T>) {
-  const hasMore = props.hasMore || false
   // Only load 1 page of items at a time.
   // Pass an empty callback to InfiniteLoader in case it asks us to load more
   // than once.
@@ -141,8 +140,7 @@ function InfiniteTable<T>(props: InfiniteTableProps<T>) {
     <Grid item lg={12} md={12} sm={12} xs={12}>
       <Paper elevation={6}>
         <InfiniteScroll
-          pageStart={0}
-          hasMore={hasMore}
+          hasMore={props.hasMore}
           loadMore={loadMore}
           loader={<span key="loadingIndicator">loading...</span>}
         >
