@@ -147,7 +147,6 @@ class Parcel:
 
     def save(self, cursor):
         values = vars(self).copy()
-        values['extra'] = json.dumps(values['extra'])
         cursor.execute(
             """
             UPDATE `s_parcels`

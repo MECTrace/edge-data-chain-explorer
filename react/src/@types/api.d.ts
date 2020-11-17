@@ -2,7 +2,7 @@ type Network = {
   chain_id: string,
 }
 
-type AccountSchema = {
+type AccountInfo = {
   chain_id: string,
   address: string,
   balance: string,
@@ -78,6 +78,12 @@ type StorageInfo = {
   hosting_fee: string,
   owner: string,
   active: boolean,
+}
+
+type Incentive = {
+  height: number,
+  address?: string,
+  amount: string,
 }
 
 // https://github.com/amolabs/docs/blob/master/protocol.md#top-level-data

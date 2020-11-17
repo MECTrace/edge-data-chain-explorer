@@ -7,7 +7,7 @@ import InfinityTable from "../component/InfinityTable"
 import ExplorerAPI from "../ExplorerAPI"
 import {Grid} from "@material-ui/core"
 import SizeTitle, {LastOptions} from "../component/SizeTitle"
-import {transactionColumns} from "../component/columns"
+import {txColumns} from "../component/columns"
 import useScrollUpdate from "../hooks/useScrollUpdate"
 
 type TransactionStatsProps = {
@@ -107,7 +107,7 @@ const Transactions = () => {
       <BlockStats setRef={setRef}/>
       <InfinityTable
         onScroll={onScroll}
-        columns={transactionColumns}
+        columns={txColumns}
         rowKey="hash"
         data={list}
         loading={loading}

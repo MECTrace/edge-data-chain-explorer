@@ -18,7 +18,7 @@ export const initialBlock = {
 
 const initialState: {
   currentHeight: number,
-  blocks: BlockState[]
+  blocks: BlockInfo[]
 } = {
   currentHeight: 1,
   blocks: []
@@ -26,14 +26,14 @@ const initialState: {
 
 export type BlocksInitialState = typeof initialState
 
-export type BlockState = typeof initialBlock
+export type BlockInfo = typeof initialBlock
 
 export const FETCH_RECENT_BLOCKS = 'FETCH_RECENT_BLOCKS'
 
 export const NEW_BLOCKS = 'NEW_BLOCKS'
 
 export const newBlocksAction = (payload: {
-  blocks: BlockState[],
+  blocks: BlockInfo[],
   currentHeight: number
 }) => ({
   type: NEW_BLOCKS,
@@ -43,7 +43,7 @@ export const newBlocksAction = (payload: {
 interface NewRecentBlocks extends Action {
   type: typeof NEW_BLOCKS,
   payload: {
-    blocks: BlockState[]
+    blocks: BlockInfo[]
     currentHeight: number
   }
 }
