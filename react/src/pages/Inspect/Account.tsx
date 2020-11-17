@@ -5,7 +5,11 @@ import {useParams} from 'react-router-dom'
 import {displayAMOLong} from "../../util"
 import {TransactionSchema} from "../../reducer/blockchain"
 import {AxiosError} from "axios"
-import {txColumns2, incentiveColumns} from "../../component/columns"
+import {
+  txColumns2,
+  incentiveColumns,
+  penaltyColumns
+} from "../../component/columns"
 import {useDispatch} from "react-redux"
 import {replace} from "connected-react-router"
 import {Tabs, Tab, Container} from "@material-ui/core"
@@ -56,6 +60,10 @@ const Account = () => {
   })
   const [txs, setTxs] = useState<TransactionSchema[]>([])
   const [incentives, setIncentives] = useState<Incentive[]>([])
+  const [penalties, setPenalties] = useState<Penalty[]>([])
+  const [hasMoreTxs, setHasMoreTxs] = useState<boolean>(true)
+  const [hasMoreIncentives, setHasMoreIncentives] = useState<boolean>(true)
+  const [hasMorePenalties, setHasMorePenalties] = useState<boolean>(true)
   const [statLoading, setStatLoading] = useState(true)
   const [tab, setTab] = useState<number>(0)
   const dispatch = useDispatch()
@@ -84,7 +92,14 @@ const Account = () => {
     ExplorerAPI
       .fetchAccountTransactions(chainId, address, 0, from, num)
       .then(({data}) => {
-        setTxs(txs.concat(data))
+        if (data.length > 0) {
+          setTxs(txs.concat(data))
+        } else {
+          setHasMoreTxs(false)
+        }
+      })
+      .catch((e: AxiosError) => {
+        setHasMoreTxs(false)
       })
   }
 
@@ -92,7 +107,29 @@ const Account = () => {
     ExplorerAPI
       .fetchAccountIncentives(chainId, address, 0, from, num)
       .then(({data}) => {
-        setIncentives(incentives.concat(data))
+        if (data.length > 0) {
+          setIncentives(incentives.concat(data))
+        } else {
+          setHasMoreIncentives(false)
+        }
+      })
+      .catch((e:AxiosError) => {
+        setHasMoreIncentives(false)
+      })
+  }
+
+  const fetchAccountPenalties = async (from: number, num: number) => {
+    ExplorerAPI
+      .fetchAccountPenalties(chainId, address, 0, from, num)
+      .then(({data}) => {
+        if (data.length > 0) {
+          setPenalties(penalties.concat(data))
+        } else {
+          setHasMorePenalties(false)
+        }
+      })
+      .catch((e:AxiosError) => {
+        setHasMorePenalties(false)
       })
   }
 
@@ -117,6 +154,7 @@ const Account = () => {
           <InfiniteTable
             rows={txs}
             columns={txColumns2}
+            hasMore={hasMoreTxs}
             loadMoreRows={fetchAccountTransactions}
           />
         </div>
@@ -124,7 +162,16 @@ const Account = () => {
           <InfiniteTable
             rows={incentives}
             columns={incentiveColumns}
+            hasMore={hasMoreIncentives}
             loadMoreRows={fetchAccountIncentives}
+          />
+        </div>
+        <div hidden={tab !== 2}>
+          <InfiniteTable
+            rows={penalties}
+            columns={penaltyColumns}
+            hasMore={hasMorePenalties}
+            loadMoreRows={fetchAccountPenalties}
           />
         </div>
       </Container>
