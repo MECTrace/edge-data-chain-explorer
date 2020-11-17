@@ -1,5 +1,5 @@
 import Axios, {AxiosResponse} from "axios"
-import {BlockState} from "./reducer/blocks"
+import {BlockInfo} from "./reducer/blocks"
 import {TransactionSchema} from "./reducer/blockchain"
 
 const defaultURL = "https://explorer.amolabs.io/api"
@@ -10,7 +10,12 @@ const client = Axios.create({
 
 type Result<T> = Promise<AxiosResponse<T>>
 
-const fetchBlocks = (chainId: string, blockHeight: number, size: number = 20): Result<BlockState[]> => {
+const fetchNetworks = (): Result<Network[]> => {
+  return client
+    .get(`/networks`)
+}
+
+const fetchBlocks = (chainId: string, blockHeight: number, size: number = 20): Result<BlockInfo[]> => {
   return client
     .get(`/chain/${chainId}/blocks?anchor=${blockHeight}&num=${size}&order=desc`)
 }
@@ -25,7 +30,7 @@ const fetchTransactions = (chainId: string, top: number, from: number, size: num
     .get(`/chain/${chainId}/txs?top=${top}&from=${from}&num=${size}`)
 }
 
-const fetchBlock = (chainId: string, height: number): Result<BlockState> => {
+const fetchBlock = (chainId: string, height: number): Result<BlockInfo> => {
   return client
     .get(`/chain/${chainId}/blocks/${height}`)
 }
@@ -61,7 +66,7 @@ const fetchDelegators = (chainId: string, address: string, from: number, size: n
     .get(`/chain/${chainId}/validators/${address}/delegators`)
 }
 
-const fetchAccount = (chainId: string, address: string): Result<AccountSchema> => {
+const fetchAccount = (chainId: string, address: string): Result<AccountInfo> => {
   return client
     .get(`/chain/${chainId}/accounts/${address}`)
 }
@@ -96,12 +101,25 @@ const fetchDraft = (chainId: string, draftId: number): Result<Draft> => {
     .get(`/chain/${chainId}/drafts/${draftId}`)
 }
 
-const fetchNodes = (chainId: string, range: number = 60, from: number = 0, num: number = 20): Result<NodeInfo[]> => {
+const fetchStorages = (chainId: string): Result<StorageInfo[]> => {
   return client
-    .get(`/chain/${chainId}/nodes?from=${from}&num=${num}`)
+    .get(`chain/${chainId}/storages`)
+}
+
+const fetchStorage = (chainId: string, storageId: number): Result<StorageInfo> => {
+  return client
+    .get(`chain/${chainId}/storages/${storageId}`)
+}
+
+const fetchAccountIncentives = (
+  chainId: string, address: string, from: number, num: number):
+    Result<Incentive[]> => {
+  return client
+    .get(`chain/${chainId}/accounts/${address}/incentives?from=${from}&num=${num}`)
 }
 
 export default {
+  fetchNetworks,
   fetchBlocks,
   fetchBlocksStats,
   fetchTransactions,
@@ -118,5 +136,7 @@ export default {
   fetchDelegators,
   fetchDrafts,
   fetchDraft,
-  fetchNodes,
+  fetchStorages,
+  fetchStorage,
+  fetchAccountIncentives,
 }

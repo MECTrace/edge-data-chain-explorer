@@ -2,17 +2,18 @@ import React, {useCallback, useState} from 'react'
 import InformationCard from "../../component/InformationCard"
 import ExplorerAPI from "../../ExplorerAPI"
 import {useParams} from 'react-router-dom'
-import {displayAmount} from "../../util"
+import {displayAMOLong} from "../../util"
 import {TransactionSchema} from "../../reducer/blockchain"
 import {AxiosError} from "axios"
 import InfinityTable from "../../component/InfinityTable"
-import {transactionColumns} from "../../component/columns"
+import {txColumns, incentiveColumns} from "../../component/columns"
 import useScrollUpdate from "../../hooks/useScrollUpdate"
 import {useDispatch} from "react-redux"
 import {replace} from "connected-react-router"
+import {Tabs, Tab, Container} from "@material-ui/core"
 import useEnsureNetwork from "../../hooks/useEnsureNetwork"
 
-const columns = [
+const infoColumns = [
   {
     key: 'address',
     header: 'Address',
@@ -25,24 +26,24 @@ const columns = [
   {
     key: 'balance',
     header: 'Balance',
-    format: displayAmount
+    format: displayAMOLong
   },
   {
     key: 'stake',
     header: 'Stake',
-    format: displayAmount
+    format: displayAMOLong
   },
   {
     key: 'delegate',
     header: 'Delegate',
-    format: displayAmount
+    format: displayAMOLong
   }
 ]
 
 const Account = () => {
   const {address} = useParams()
 
-  const [account, setAccount] = useState<AccountSchema>({
+  const [account, setAccount] = useState<AccountInfo>({
     address: address as string,
     balance: '0',
     chain_id: '',
@@ -55,7 +56,12 @@ const Account = () => {
   })
   const [statLoading, setStatLoading] = useState(true)
   const [ref, setRef] = useState<HTMLDivElement | undefined>(undefined)
+  const [tab, setTab] = useState<number>(0)
   const dispatch = useDispatch()
+
+  const handleTabChange = (e: React.ChangeEvent<{}>, newValue: number) => {
+    setTab(newValue)
+  }
 
   const fetchAccount = useCallback((chainId: string) => {
     ExplorerAPI
@@ -78,25 +84,56 @@ const Account = () => {
     }
     return null
   }, [address])
-  const [list, loading, onScroll] = useScrollUpdate<TransactionSchema>(fetchAccountTransactions, ref)
+  const [txList, loading, onTxScroll] = useScrollUpdate<TransactionSchema>(fetchAccountTransactions, ref)
+
+  const fetchAccountIncentives = useCallback(
+    async (size: number, fixedHeight: number, chainId: string) => {
+    if (fixedHeight !== -1) {
+      const {data} = await ExplorerAPI.fetchAccountIncentives(
+        chainId, address, fixedHeight, size)
+      return data
+    }
+    return null
+  }, [address])
+  const [incentiveList, incLoading, onIncScroll] = useScrollUpdate<Incentive>(fetchAccountIncentives, ref)
 
   return (
     <>
       <InformationCard
         setRef={setRef}
         title="Account information"
-        columns={columns}
+        columns={infoColumns}
         data={account}
         divider
         loading={statLoading}
       />
-      <InfinityTable
-        onScroll={onScroll}
-        columns={transactionColumns}
-        rowKey="hash"
-        data={list}
-        loading={loading}
-      />
+      <Container>
+        <Tabs value={tab} onChange={handleTabChange}>
+          <Tab label="Sent Txs"/>
+          <Tab label="Incentives"/>
+          <Tab label="Penalties"/>
+        </Tabs>
+      </Container>
+      <Container style={{padding:"0 8px"}}>
+        <div hidden={tab !== 0}>
+          <InfinityTable
+            onScroll={onTxScroll}
+            columns={txColumns}
+            rowKey="hash"
+            data={txList}
+            loading={loading}
+          />
+        </div>
+        <div hidden={tab !== 1}>
+          <InfinityTable
+            onScroll={onIncScroll}
+            columns={incentiveColumns}
+            rowKey="hash"
+            data={incentiveList}
+            loading={incLoading}
+          />
+        </div>
+      </Container>
     </>
   )
 }

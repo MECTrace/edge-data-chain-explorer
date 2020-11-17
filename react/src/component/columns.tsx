@@ -1,8 +1,8 @@
 import {Link} from "react-router-dom"
-import {displayAddress, displayResult} from "../util"
+import {displayAddress, displayResult, displayAMO} from "../util"
 import React from "react"
 
-export const transactionColumns = [
+export const txColumns = [
   {
     key: 'height',
     label: 'Height',
@@ -55,6 +55,14 @@ export const transactionColumns = [
     flexGrow: 1
   },
   {
+    key: 'fee',
+    label: 'Tx Fee',
+    width: 100,
+    columnData: {
+      format: displayAMO
+    }
+  },
+  {
     key: 'info',
     label: 'Result',
     width: 100,
@@ -63,4 +71,29 @@ export const transactionColumns = [
       format: displayResult
     }
   }
+]
+
+export const incentiveColumns = [
+  {
+    key: 'height',
+    label: 'Height',
+    width: 100,
+    columnData: {
+      format: (height: number, chainId: string) => {
+        return (
+          <Link to={`/${chainId}/inspect/block/${height}`}>
+            {height}
+          </Link>
+        )
+      }
+    }
+  },
+  {
+    key: 'amount',
+    label: 'Incentive',
+    width: 100,
+    columnData: {
+      format: displayAMO
+    }
+  },
 ]
