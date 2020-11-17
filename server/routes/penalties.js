@@ -80,9 +80,10 @@ router.get('/', function(req, res) {
 function handleAccountPenalties(req, res) {
   const chain_id = res.locals.chain_id;
   const address = req.params.address;
+  var anchor = req.query.anchor || 0;
   var from = req.query.from || 0;
   var num = req.query.num || 20;
-  penalty.getListByAddress(chain_id, address, from, num)
+  penalty.getListByAddress(chain_id, address, anchor, from, num)
     .then((rows) => {
       if (rows) {
         res.status(200);
@@ -104,6 +105,12 @@ function handleAccountPenalties(req, res) {
  *   parameters:
  *     - $ref: '#/definitions/ChainId'
  *     - $ref: '#/definitions/Address'
+ *     - name: anchor
+ *       in: query
+ *       description: anchor height to query (0 value means last block)
+ *       schema:
+ *         type: integer
+ *         default: 0
  *     - name: from
  *       in: query
  *       description: offset from the result
