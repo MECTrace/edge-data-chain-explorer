@@ -9,6 +9,7 @@ async function getList(chain_id, from, num) {
         `height`, `address`, `amount` \
       FROM `s_incentives` \
       WHERE `chain_id` = ? \
+      ORDER BY `height` DESC \
       LIMIT ?, ?";
     var query_var = [chain_id, from, num];
     db.query(query_str, query_var, function(err, rows, fields) {
@@ -32,6 +33,7 @@ async function getListByAddress(chain_id, address, anchor, from, num) {
           `height`, `amount` \
         FROM `s_incentives` \
         WHERE `chain_id` = ? AND `address` = ? \
+        ORDER BY `height` DESC \
         LIMIT ?, ?";
       query_var = [chain_id, address, from, num];
     } else {
@@ -39,6 +41,7 @@ async function getListByAddress(chain_id, address, anchor, from, num) {
           `height`, `amount` \
         FROM `s_incentives` \
         WHERE `chain_id` = ? AND `address` = ? AND `height` <= ? \
+        ORDER BY `height` DESC \
         LIMIT ?, ?";
       query_var = [chain_id, address, anchor, from, num];
     }
