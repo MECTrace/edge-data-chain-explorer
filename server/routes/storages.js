@@ -88,6 +88,8 @@ router.get('/', function(req, res) {
  *           application/json:
  *             schema:
  *               $ref: '#/definitions/StorageInfo'
+ *       404:
+ *         description: Storage not found
  */
 router.get('/:storage([0-9]+)', function(req, res) {
   const chain_id = res.locals.chain_id;

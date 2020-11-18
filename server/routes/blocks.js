@@ -236,8 +236,6 @@ router.get('/:height([0-9]+)', function(req, res) {
  *               type: array
  *               items:
  *                 $ref: '#/definitions/TxInfo'
- *       404:
- *         description: Block not found
  */
 router.get('/:height([0-9]+)/txs', function(req, res) {
   const chain_id = res.locals.chain_id;
@@ -246,10 +244,8 @@ router.get('/:height([0-9]+)/txs', function(req, res) {
   var num = req.query.num || 20;
   tx.getListByBlock(chain_id, height, from, num)
     .then((rows) => {
-      if (rows.length > 0) {
-        res.status(200);
-        res.send(rows);
-      }
+      res.status(200);
+      res.send(rows);
     })
     .catch((err) => {
       res.status(500);
