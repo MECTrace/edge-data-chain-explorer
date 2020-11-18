@@ -1,6 +1,6 @@
 import React, {useCallback, useEffect, useState} from 'react'
 import {Link, useParams} from 'react-router-dom'
-import {BlockInfo, initialBlock} from "../../reducer/blocks"
+import {BlockState, initialBlock} from "../../reducer/blocks"
 import {useChainId} from "../../reducer"
 import ExplorerAPI from "../../ExplorerAPI"
 import InformationCard from "../../component/InformationCard"
@@ -40,7 +40,7 @@ const columns = [
   {
     key: 'time',
     header: 'Time',
-    format: (time: string, chainId: string, data: BlockInfo) => {
+    format: (time: string, chainId: string, data: BlockState) => {
       return `${moment(time).fromNow()} (${moment(time).format("YYYY-MM-DD HH:mm:ss.SSS ZZ")}) (+${data.interval.toFixed(3)} sec)`
     }
   },
@@ -116,7 +116,7 @@ const transactionColumns = [
 const Block = () => {
   const {height} = useParams()
 
-  const [block, setBlock] = useState<BlockInfo>(initialBlock)
+  const [block, setBlock] = useState<BlockState>(initialBlock)
   const chainId = useChainId()
 
   const [blockLoading, setBlockLoading] = useState(true)

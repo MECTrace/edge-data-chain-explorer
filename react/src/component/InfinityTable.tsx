@@ -272,6 +272,13 @@ function InfinityTable<T>(props: Props<T>) {
               <Backdrop open={props.loading === 'FETCH'} className={classes.backdrop}>
                 <CircularProgress color="inherit"/>
               </Backdrop>
+              {
+                (props.loading === 'READY' && props.data.length === 0) && (
+                  <div className={classes.loading}>
+                    <CircularProgress/>
+                  </div>
+                )
+              }
             </div>
           )}
         </WindowScroller>
