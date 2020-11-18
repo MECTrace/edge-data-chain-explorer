@@ -14,6 +14,10 @@ import {
 import InfiniteScroll from "react-infinite-scroller"
 import {useChainId} from "../reducer"
 
+// NOTE: The following code was borrowed from
+// https://github.com/bvaughn/react-virtualized/blob/master/docs/creatingAnInfiniteLoadingList.md
+// and modified for our use.
+
 const useStyles = makeStyles((theme: Theme) => ({
   table: {
     display: 'table',
@@ -79,9 +83,6 @@ type InfiniteTableProps<T> = {
   rows: T[],
   // for display
   columns: Column[]
-  // indicator whether there are more rows to load,
-  // should be set false from outside
-  hasMore: boolean
   // Callback function responsible for loading the next page of items.
   loadMoreRows: (from: number, num: number) => Promise<any>,
 }
@@ -140,7 +141,8 @@ function InfiniteTable<T>(props: InfiniteTableProps<T>) {
     <Grid item lg={12} md={12} sm={12} xs={12}>
       <Paper elevation={6}>
         <InfiniteScroll
-          hasMore={props.hasMore}
+          pageStart={0}
+          hasMore={true}
           loadMore={loadMore}
           loader={<span key="loadingIndicator">loading...</span>}
         >

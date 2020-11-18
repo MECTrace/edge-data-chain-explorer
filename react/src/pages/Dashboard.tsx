@@ -6,7 +6,7 @@ import {RootState} from "../reducer"
 import {GraphState} from "../reducer/blockchain"
 import LinearGraph from "../component/LinearGraph"
 import CollapseTable from "../component/CollapseTable"
-import {BlockState, FETCH_RECENT_BLOCKS} from "../reducer/blocks"
+import {BlockInfo, FETCH_RECENT_BLOCKS} from "../reducer/blocks"
 import moment from 'moment'
 import {Link} from "react-router-dom"
 import {Grid} from "@material-ui/core"
@@ -24,7 +24,7 @@ const columns = [
   },
   {
     key: 'time',
-    format: (s: string, chainId: string, rowData: BlockState) => {
+    format: (s: string, chainId: string, rowData: BlockInfo) => {
       const diff = Math.abs(moment().diff(moment(s)))
       return `${diff < 60000 ? `${Math.floor(diff / 1000)} seconds ago` : moment(s).fromNow()} (+${rowData.interval.toFixed(3)} sec)`
     }
@@ -47,7 +47,7 @@ const columns = [
 
 const RecentBlocks = () => {
   const height = useSelector<RootState, number>(state => state.blockchain.blockState.height)
-  const blocks = useSelector<RootState, BlockState[]>(state => state.blocks.blocks)
+  const blocks = useSelector<RootState, BlockInfo[]>(state => state.blocks.blocks)
 
   const dispatch = useDispatch()
 
@@ -56,7 +56,7 @@ const RecentBlocks = () => {
   }, [height, dispatch])
 
   return (
-    <CollapseTable<BlockState>
+    <CollapseTable<BlockInfo>
       dataSource={blocks}
       columns={columns}
       rowKey='height'

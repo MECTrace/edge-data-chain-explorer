@@ -30,7 +30,6 @@ import Transactions from "./pages/Transactions"
 import Blocks from "./pages/Blocks"
 import Validators from "./pages/Validators"
 import Storages from "./pages/Storages"
-import Nodes from "./pages/Nodes"
 import Footer from "./component/Footer"
 
 const useStyles = makeStyles((theme) => ({
@@ -84,10 +83,6 @@ const routers: RouteProps[] = [
   {
     path: '/:chainId/storages',
     component: Storages
-  },
-  {
-    path: '/:chainId/nodes',
-    component: Nodes
   },
 ]
 
@@ -153,7 +148,7 @@ const ExplorerBar = () => {
     <AppBar position="fixed">
       <Toolbar>
         <img src={require('./assets/amo_white.png')} alt="logo" style={{
-          height: '30px',
+          height: '36px',
           marginRight: '12px'
         }}/>
         <Hidden only={['xs', 'sm']}>
