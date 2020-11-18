@@ -85,13 +85,8 @@ function handleAccountPenalties(req, res) {
   var num = req.query.num || 20;
   penalty.getListByAddress(chain_id, address, anchor, from, num)
     .then((rows) => {
-      if (rows) {
-        res.status(200);
-        res.send(rows);
-      } else {
-        res.status(404);
-        res.send('not found')
-      }
+      res.status(200);
+      res.send(rows);
     })
     .catch((err) => {
       res.status(500);

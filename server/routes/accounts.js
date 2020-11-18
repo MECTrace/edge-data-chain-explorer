@@ -199,13 +199,8 @@ router.get('/:address([a-fA-F0-9]+)/txs', function(req, res) {
   var num = req.query.num || 20;
   tx.getListBySender(chain_id, req.params.address, top, from, num)
     .then((rows) => {
-      if (rows.length > 0) {
-        res.status(200);
-        res.send(rows);
-      } else {
-        res.status(404);
-        res.send('not found');
-      }
+      res.status(200);
+      res.send(rows);
     })
     .catch((err) => {
       res.status(500);
