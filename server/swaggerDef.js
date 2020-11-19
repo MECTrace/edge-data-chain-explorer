@@ -41,16 +41,16 @@ module.exports = {
       description: 'drafts and votes',
     },
     {
-      name: 'nodes',
-      description: 'nodes',
-    },
-    {
       name: 'incentives',
       description: 'incentives',
     },
     {
       name: 'penalties',
       description: 'penalties',
+    },
+    {
+      name: 'nodes',
+      description: 'nodes',
     },
   ],
   basePath: '/',

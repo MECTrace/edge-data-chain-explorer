@@ -20,9 +20,9 @@ const swaggerOptions = {
     'routes/drafts.js',
     'routes/parcels.js',
     'routes/storages.js',
-    'routes/nodes.js',
     'routes/incentives.js',
     'routes/penalties.js',
+    'routes/nodes.js',
   ]
 }
 const swaggerSpec = swaggerJSDoc(swaggerOptions);
