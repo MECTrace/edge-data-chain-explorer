@@ -277,6 +277,7 @@ CREATE TABLE `node_history` (
   `latest_block_height` int(11) NOT NULL,
   `catching_up` boolean NOT NULL default false,
   `elapsed` float(8,6) NOT NULL default 0,
+  `online` boolean NOT NULL default false,
   PRIMARY KEY (`chain_id`, `node_id`, `timestamp`),
   CONSTRAINT `nodes_FK` FOREIGN KEY (`chain_id`, `node_id`) REFERENCES `nodes` (`chain_id`, `node_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;

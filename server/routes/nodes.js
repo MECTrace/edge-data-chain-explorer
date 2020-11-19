@@ -88,6 +88,9 @@ function dateToStr(target) {
  *               type: array
  *               items:
  *                 $ref: '#/definitions/NodeInfo'
+ *       404:
+ *         description: not found
+ *
  */
 router.get('/', function(req, res) {
   const chain_id = res.locals.chain_id;
@@ -203,8 +206,13 @@ router.get('/:node_id([a-fA-F0-9]+)/history', function(req, res) {
   const num = req.query.num || 20;
   node.getHistory(chain_id, node_id, anchor, from, num)
     .then((row) => {
-      res.status(200);
-      res.send(row);
+      if (row) {
+        res.status(200);
+        res.send(row);
+      } else {
+        res.status(404);
+        res.send('not found');
+      }
     })
     .catch((err) => {
       res.status(500);

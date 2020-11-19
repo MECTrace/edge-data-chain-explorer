@@ -77,35 +77,12 @@ router.get('/', function(req, res) {
     });
 });
 
-function handleAccountPenalties(req, res) {
-  const chain_id = res.locals.chain_id;
-  const address = req.params.address;
-  var anchor = req.query.anchor || 0;
-  var from = req.query.from || 0;
-  var num = req.query.num || 20;
-  penalty.getListByAddress(chain_id, address, anchor, from, num)
-    .then((rows) => {
-      res.status(200);
-      res.send(rows);
-    })
-    .catch((err) => {
-      res.status(500);
-      res.send(err);
-    });
-}
-
 /**
  * @swagger
  * /chain/{chain_id}/penalties/{address}:
  *   parameters:
  *     - $ref: '#/definitions/ChainId'
  *     - $ref: '#/definitions/Address'
- *     - name: anchor
- *       in: query
- *       description: anchor height to query (0 value means last block)
- *       schema:
- *         type: integer
- *         default: 0
  *     - name: from
  *       in: query
  *       description: offset from the result
@@ -134,7 +111,25 @@ function handleAccountPenalties(req, res) {
  *               items:
  *                 $ref: '#/definitions/PenaltyWOAddr'
  */
-router.get('/:address([a-fA-F0-9]+)', handleAccountPenalties);
+router.get('/:address([a-fA-F0-9]+)', function(req, res) {
+  const chain_id = res.locals.chain_id;
+  const address = req.params.address;
+  var from = req.query.from || 0;
+  var num = req.query.num || 20;
+  penalty.getListByAddress(chain_id, address, from, num)
+    .then((rows) => {
+      if (rows) {
+        res.status(200);
+        res.send(rows);
+      } else {
+        res.status(404);
+        res.send('not found')
+      }
+    })
+    .catch((err) => {
+      res.status(500);
+      res.send(err);
+    });
+});
 
 module.exports = router;
-module.exports.handleAccountPenalties = handleAccountPenalties;

@@ -34,6 +34,22 @@ const columns = [
       )
     }
   },
+  {
+    key: 'latest_block_height',
+    header: 'Latest block',
+  },
+  {
+    key: 'catching_up',
+    header: 'Syncing',
+  },
+  {
+    key: 'timestamp',
+    header: 'Last time'
+  },
+  {
+    key: 'uptime',
+    header: 'Uptime',
+  }
 ]
 
 const Nodes = () => {
@@ -43,9 +59,10 @@ const Nodes = () => {
 
   useEffect(() => {
     ExplorerAPI
-      .fetchNodes(chainId, 0)
+      .fetchNodes(chainId, 3600)
       .then(({data}) => {
         setNodes(data)
+        setLoading(false)
       })
       .catch(() => {
         setLoading(false)
