@@ -27,7 +27,7 @@ const useStyles = makeStyles((theme: Theme) => ({
     alignItems: 'center'
   },
   tableCell: {
-    flex: '0 1 auto',
+    flex: '1 1 auto',
     textAlign: 'center',
     verticalAlign: 'middle',
     border: 0,
@@ -40,29 +40,27 @@ const useStyles = makeStyles((theme: Theme) => ({
       overflow: 'hidden',
     },
   },
+  collapsedRow: {
+    display: 'flex',
+    flexFlow: 'row wrap',
+    width: '100%',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
   collapsedCell: {
     flex: '1 1 auto',
     display: 'flex',
-    flexDirection: 'column',
-    height: '100%',
-    justifyContent: 'space-between'
-  },
-  collapsedCellWrapper: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center'
+    alignItems: 'center',
+    marginRight: '10px',
   },
   collapsedCellHeader: {
-    fontWeight: 600
+    fontWeight: 600,
   },
   collapsedCellBody: {
     maxWidth: '50vw',
     whiteSpace: 'nowrap',
     textOverflow: 'ellipsis',
     overflow: 'hidden',
-    '& *': {
-      width: '100%'
-    }
   },
 }))
 
@@ -116,22 +114,20 @@ function InfiniteTable<T>(props: InfiniteTableProps<T>) {
   const collapsedCellRender = (rowData: any) => {
     return (
       <TableCell
+        key={"collapsed"}
         component="div"
-        className={classes.tableCell}
-        style={{height: '170px'}}
+        className={classes.collapsedRow}
       >
-        <div className={classes.collapsedCell}>
-          {props.columns.map((c, i) => (
-            <div key={i} className={classes.collapsedCellWrapper}>
-              <div className={classes.collapsedCellHeader}>
-                {c.label}
-              </div>
-              <div className={classes.collapsedCellBody}>
-                {c.format ? c.format(rowData[c.key], chain_id) : rowData[c.key]}
-              </div>
-            </div>
-          ))}
-        </div>
+        {props.columns.map((c, i) => (
+          <div key={i} className={classes.collapsedCell}>
+            <span className={classes.collapsedCellHeader}>
+              {c.label}:&nbsp;
+            </span>
+            <span className={classes.collapsedCellBody}>
+              {c.format ? c.format(rowData[c.key], chain_id) : rowData[c.key]}
+            </span>
+          </div>
+        ))}
       </TableCell>
     )
   }
@@ -151,14 +147,7 @@ function InfiniteTable<T>(props: InfiniteTableProps<T>) {
             <TableHead
               component="div"
             >
-              {breakMD ? (
-                <TableRow
-                  className={classes.row}
-                  component="div"
-                >
-                  <TableCell>Txs</TableCell>
-                </TableRow>
-                ) : (
+              {breakMD ? (<div/>) : (
                 <TableRow
                   className={classes.row}
                   component="div"
@@ -189,13 +178,7 @@ function InfiniteTable<T>(props: InfiniteTableProps<T>) {
                     component="div"
                   >
                   {breakMD ?
-                    (<TableCell
-                      key={'hash'}
-                      component="div"
-                      className={classes.tableCell}
-                    >
-                      narrow index {rowIndex}
-                    </TableCell>) : 
+                    (collapsedCellRender(rowData)) :
                     (props.columns.map(({key, format, style}) => {
                       const cellData = rowData[key as keyof T]
                       return cellRenderer(key, cellData, format, style)
