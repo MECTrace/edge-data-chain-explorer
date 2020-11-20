@@ -50,7 +50,7 @@ async function getList(chain_id, from, to) {
     var query_str = "SELECT \
         n.`node_id`, n.`moniker`, h.`val_addr`, \
         h.`latest_block_height`, h.`latest_block_time`, \
-        h.`catching_up`, h.`elapsed`, h.`timestamp` \
+        h.`catching_up`, h.`elapsed`, h.`timestamp`, 0 `uptime` \
       FROM `nodes` n \
       LEFT JOIN `node_history` h \
       ON n.`chain_id` = h.`chain_id` AND n.`node_id` = h.`node_id` \
@@ -79,12 +79,11 @@ async function getList(chain_id, from, to) {
         if(err) {
           return reject(err);
         }
-        if(rows.length == 0) {
-          return resolve(rows)
-        }
         for (i=0; i<rows.length; i++) {
-          if (result[i].node_id == rows[i].node_id) {
-            result[i].uptime = rows[i].uptime;
+          for (j = 0; j < result.length; j++) {
+            if (result[j].node_id == rows[i].node_id) {
+              result[j].uptime = rows[i].uptime;
+            }
           }
         }
         resolve(result);
