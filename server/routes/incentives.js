@@ -77,12 +77,36 @@ router.get('/', function(req, res) {
     });
 });
 
+function handleAccountIncentives(req, res) {
+  const chain_id = res.locals.chain_id;
+  const address = req.params.address;
+  var anchor = req.query.anchor || 0;
+  var from = req.query.from || 0;
+  var num = req.query.num || 20;
+  console.log(chain_id, address, from, num)
+  incentive.getListByAddress(chain_id, address, anchor, from, num)
+    .then((rows) => {
+      res.status(200);
+      res.send(rows);
+    })
+    .catch((err) => {
+      res.status(500);
+      res.send(err);
+    });
+}
+
 /**
  * @swagger
  * /chain/{chain_id}/incentives/{address}:
  *   parameters:
  *     - $ref: '#/definitions/ChainId'
  *     - $ref: '#/definitions/Address'
+ *     - name: anchor
+ *       in: query
+ *       description: anchor height to query (0 value means last block)
+ *       schema:
+ *         type: integer
+ *         default: 0
  *     - name: from
  *       in: query
  *       description: offset from the result
@@ -111,25 +135,7 @@ router.get('/', function(req, res) {
  *               items:
  *                 $ref: '#/definitions/IncentiveWOAddr'
  */
-router.get('/:address([a-fA-F0-9]+)', function(req, res) {
-  const chain_id = res.locals.chain_id;
-  const address = req.params.address;
-  var from = req.query.from || 0;
-  var num = req.query.num || 20;
-  incentive.getListByAddress(chain_id, address, from, num)
-    .then((rows) => {
-      if (rows) {
-        res.status(200);
-        res.send(rows);
-      } else {
-        res.status(404);
-        res.send('not found')
-      }
-    })
-    .catch((err) => {
-      res.status(500);
-      res.send(err);
-    });
-});
+router.get('/:address([a-fA-F0-9]+)', handleAccountIncentives);
 
 module.exports = router;
+module.exports.handleAccountIncentives = handleAccountIncentives;

@@ -94,13 +94,8 @@ router.get('/', function(req, res) {
     const from = dateToStr(new Date(Date.parse(to) - range * 1000));
     validator.getList(chain_id, from, to)
       .then((rows) => {
-        if (rows.length > 0) {
-          res.status(200);
-          res.send(rows);
-        } else {
-          res.status(404);
-          res.send('not found');
-        }
+        res.status(200);
+        res.send(rows);
       })
       .catch((err) => {
         res.status(500);
@@ -134,6 +129,8 @@ router.get('/', function(req, res) {
  *           application/json:
  *             schema:
  *               $ref: '#/definitions/ValidatorInfo'
+ *       404:
+ *         description: Validator not found
  */
 router.get('/:address([a-fA-F0-9]+)', function(req, res) {
   const chain_id = res.locals.chain_id;
@@ -195,13 +192,8 @@ router.get('/:address([a-fA-F0-9]+)/delegators', function(req, res) {
   var num = req.query.num || 20;
   validator.getDelegators(chain_id, req.params.address, from, num)
     .then((rows) => {
-      if (rows) {
-        res.status(200);
-        res.send(rows);
-      } else {
-        res.status(404);
-        res.send('not found');
-      }
+      res.status(200);
+      res.send(rows);
     })
     .catch((err) => {
       res.status(500);

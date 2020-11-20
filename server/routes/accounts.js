@@ -3,6 +3,8 @@ var express = require('express');
 var router = express.Router();
 const account = require('../models/account');
 const tx = require('../models/tx');
+const handleAccountIncentives = require('./incentives').handleAccountIncentives;
+const handleAccountPenalties = require('./penalties').handleAccountPenalties;
 
 /**
  * @swagger
@@ -197,18 +199,33 @@ router.get('/:address([a-fA-F0-9]+)/txs', function(req, res) {
   var num = req.query.num || 20;
   tx.getListBySender(chain_id, req.params.address, top, from, num)
     .then((rows) => {
-      if (rows.length > 0) {
-        res.status(200);
-        res.send(rows);
-      } else {
-        res.status(404);
-        res.send('not found');
-      }
+      res.status(200);
+      res.send(rows);
     })
     .catch((err) => {
       res.status(500);
       res.send(err);
     });
 });
+
+/**
+ * @swagger
+ * /chain/{chain_id}/accounts/{address}/incentives:
+ *   get:
+ *     tags:
+ *       - accounts
+ *     description: Alias of `/chain/{chain_id}/incentives/{address}`
+ */
+router.get('/:address([a-fA-F0-9]+)/incentives', handleAccountIncentives);
+
+/**
+ * @swagger
+ * /chain/{chain_id}/accounts/{address}/penalties:
+ *   get:
+ *     tags:
+ *       - accounts
+ *     description: Alias of `/chain/{chain_id}/penalties/{address}`
+ */
+router.get('/:address([a-fA-F0-9]+)/penalties', handleAccountPenalties);
 
 module.exports = router;
