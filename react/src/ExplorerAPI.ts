@@ -15,9 +15,9 @@ const fetchNetworks = (): Result<Network[]> => {
     .get(`/networks`)
 }
 
-const fetchBlocks = (chainId: string, blockHeight: number, size: number = 20): Result<BlockInfo[]> => {
+const fetchBlocks = (chainId: string, anchor: number, from: number, size: number = 20): Result<BlockInfo[]> => {
   return client
-    .get(`/chain/${chainId}/blocks?anchor=${blockHeight}&num=${size}&order=desc`)
+    .get(`/chain/${chainId}/blocks?anchor=${anchor}&from=${from}&num=${size}`)
 }
 
 const fetchBlocksStats = (chainId: string, blocks: number = 100): Result<BlockStat> => {

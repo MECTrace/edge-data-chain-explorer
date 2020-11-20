@@ -1,18 +1,17 @@
-import React, {useCallback, useEffect, useState} from 'react'
-import {Link, useParams} from 'react-router-dom'
-import {BlockInfo, initialBlock} from "../../reducer/blocks"
-import {useChainId} from "../../reducer"
+import React, {useEffect, useState} from 'react'
 import ExplorerAPI from "../../ExplorerAPI"
+import InfiniteTable from "../../component/InfiniteTable"
 import InformationCard from "../../component/InformationCard"
-import InfinityTable from "../../component/InfinityTable"
-import {TransactionSchema} from "../../reducer/blockchain"
 import moment from 'moment'
-import {displayAMO, displayResult} from "../../util"
-import {useDispatch} from "react-redux"
+import {BlockInfo, initialBlock} from "../../reducer/blocks"
+import {Link, useParams} from 'react-router-dom'
+import {TransactionSchema} from "../../reducer/blockchain"
 import {replace} from "connected-react-router"
-import useScrollUpdate from "../../hooks/useScrollUpdate"
+import {useChainId} from "../../reducer"
+import {useDispatch} from "react-redux"
+import {txColumns} from "../../component/columns"
 
-const columns = [
+const infoColumns = [
   {
     key: 'height',
     header: 'Height'
@@ -50,121 +49,62 @@ const columns = [
   }
 ]
 
-const transactionColumns = [
-  {
-    key: 'index',
-    label: 'Index',
-    width: 100,
-    flexGrow: 1,
-  },
-  {
-    key: 'hash',
-    label: 'Hash',
-    width: 100,
-    flexGrow: 8,
-    columnData: {
-      format: (hash: string, chainId: string) => {
-        return (
-          <Link to={`/${chainId}/inspect/tx/${hash}`}>
-            <code>{hash}</code>
-          </Link>
-        )
-      }
-    }
-  },
-  {
-    key: 'sender',
-    label: 'Sender',
-    width: 100,
-    flexGrow: 5,
-    columnData: {
-      format: (sender: string, chainId: string) => {
-        return (
-          <Link to={`/${chainId}/inspect/account/${sender}`}>
-            <code>{sender}</code>
-          </Link>
-        )
-      }
-    }
-  },
-  {
-    key: 'type',
-    label: 'Type',
-    width: 100,
-    flexGrow: 1,
-  },
-  {
-    key: 'fee',
-    label: 'Tx Fee',
-    width: 100,
-    flexGrow: 1,
-    columnData: {
-      format: displayAMO
-    }
-  },
-  {
-    key: 'info',
-    label: 'Result',
-    width: 100,
-    flexGrow: 1,
-    columnData: {
-      format: displayResult
-    }
-  }
-]
-
 const Block = () => {
-  const {height} = useParams()
-
-  const [block, setBlock] = useState<BlockInfo>(initialBlock)
+  const dispatch = useDispatch()
   const chainId = useChainId()
 
-  const [blockLoading, setBlockLoading] = useState(true)
-  const [ref, setRef] = useState<HTMLDivElement | undefined>(undefined)
-  const dispatch = useDispatch()
+  // first section
+  const {height} = useParams()
+  const [block, setBlock] = useState<BlockInfo>(initialBlock)
+  const [statLoading, setStatLoading] = useState(true)
+
+  // second section
+  const [txs, setTxs] = useState<TransactionSchema[]>([])
+  const [hasMoreTxs, setHasMoreTxs] = useState<boolean>(false)
 
   useEffect(() => {
-    if (height) {
-      const blockHeight = parseInt(height)
+    setTxs([])
+    if (chainId && height) {
       ExplorerAPI
-        .fetchBlock(chainId, blockHeight)
+        .fetchBlock(chainId, height as number)
         .then(({data}) => {
           setBlock(data)
-          setBlockLoading(false)
+          setStatLoading(false)
+          setHasMoreTxs(true)
         })
         .catch(() => {
           dispatch(replace(`/${chainId}/inspect/404`, {type: 'BLOCK', search: height}))
-          setBlockLoading(false)
+          setStatLoading(false)
         })
     }
   }, [chainId, height, dispatch])
 
-  const fetchBlockTransactions = useCallback(async (size: number, fixedHeight: number, chainId: string) => {
-    const blockHeight = parseInt(height)
-    if (fixedHeight !== -1) {
-      const {data} = await ExplorerAPI.fetchBlockTransactions(chainId, blockHeight, size)
-      return data
-    }
-    return null
-  }, [height])
-  const [list, txLoading, onScroll] = useScrollUpdate<TransactionSchema>(fetchBlockTransactions, ref)
+  const fetchBlockTxs = async (from: number, num: number) => {
+    if (chainId && height && hasMoreTxs) {
+      const {data} = await ExplorerAPI
+        .fetchBlockTransactions(chainId, height, from, num)
+      if (data.length > 0) {
+        setTxs(txs.concat(data))
+      } else {
+        setHasMoreTxs(false)
+      }
+  }
+  }
 
   return (
     <>
       <InformationCard
         title="Block information"
-        setRef={setRef}
-        columns={columns}
+        columns={infoColumns}
         data={block}
         divider
-        loading={blockLoading}
+        loading={statLoading}
       />
-      <InfinityTable
-        onScroll={onScroll}
-        columns={transactionColumns}
-        rowKey="hash"
-        data={list}
-        loading={txLoading}
+      <InfiniteTable
+        rows={txs}
+        columns={txColumns}
+        hasMore={hasMoreTxs}
+        loadMoreRows={fetchBlockTxs}
       />
     </>
   )

@@ -39,6 +39,10 @@ export const useChainId = () => {
   return useSelector<RootState, string>(state => state.blockchain.chainId, shallowEqual)
 }
 
+export const useHeight = () => {
+  return useSelector<RootState, number>(state => state.blockchain.height, shallowEqual)
+}
+
 export const usePath = () => {
   return useSelector<RootState, string>((state: RootState) => state.router.location.pathname)
 }

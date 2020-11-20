@@ -104,7 +104,6 @@ export default (state: BlockchainInitialState = initialState, action: actions) =
       return {
         ...state,
         chainId: action.payload,
-        height: 1,
         updated: false
       }
     default:

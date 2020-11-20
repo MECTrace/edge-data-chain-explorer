@@ -1,20 +1,15 @@
-import React, {useCallback, useEffect, useState} from 'react'
-import {useChainId} from "../reducer"
-import {TransactionSchema} from "../reducer/blockchain"
+import React, {useEffect, useState} from 'react'
+import ExplorerAPI from "../ExplorerAPI"
+import InfiniteTable from "../component/InfiniteTable"
+import SizeTitle, {LastOptions} from "../component/SizeTitle"
 import StatCard from "../component/StatCard"
 import {Equalizer, HighlightOff, Speed, Timelapse} from "@material-ui/icons"
-import InfinityTable from "../component/InfinityTable"
-import ExplorerAPI from "../ExplorerAPI"
 import {Grid} from "@material-ui/core"
-import SizeTitle, {LastOptions} from "../component/SizeTitle"
+import {TransactionSchema} from "../reducer/blockchain"
 import {txColumns} from "../component/columns"
-import useScrollUpdate from "../hooks/useScrollUpdate"
+import {useChainId, useHeight} from "../reducer"
 
-type TransactionStatsProps = {
-  setRef: (instance?: HTMLDivElement) => void
-}
-
-const BlockStats = (props: TransactionStatsProps) => {
+const TxsStats = () => {
   const [txStat, setTxStat] = useState<TxStat>({
     chain_id: 'amo-cherrryblossom-01',
     avg_binding_lag: 0,
@@ -46,7 +41,6 @@ const BlockStats = (props: TransactionStatsProps) => {
       <StatCard
         title={<SizeTitle target="Tx" values={LastOptions} onSizeChange={onSizeChange}/>}
         size="large"
-        setRef={props.setRef}
       >
         <Grid
           container
@@ -90,27 +84,42 @@ const BlockStats = (props: TransactionStatsProps) => {
 }
 
 const Transactions = () => {
-  const [ref, setRef] = useState<HTMLDivElement | undefined>(undefined)
+  const chainId = useChainId()
+  const lastHeight = useHeight()
 
-  const fetchTransactions = useCallback(async (size: number, fixedHeight: number, chainId: string) => {
-    if (fixedHeight !== -1) {
-      const {data} = await ExplorerAPI.fetchTransactions(chainId, fixedHeight, size)
-      return data
+  // first section
+
+  // second section
+  const [txs, setTxs] = useState<TransactionSchema[]>([])
+  const [hasMoreTxs, setHasMoreTxs] = useState<boolean>(false)
+
+  useEffect(() => {
+    setTxs([])
+    if (chainId && lastHeight) {
+      setHasMoreTxs(true)
     }
+  }, [chainId, lastHeight])
 
-    return null
-  }, [])
-  const [list, loading, onScroll] = useScrollUpdate<TransactionSchema>(fetchTransactions, ref)
+  const fetchTxs = async (from: number, num: number) => {
+    if (chainId && hasMoreTxs) {
+      const {data} = await ExplorerAPI
+        .fetchTransactions(chainId, lastHeight, from, num)
+      if (data.length > 0) {
+        setTxs(txs.concat(data))
+      } else {
+        setHasMoreTxs(false)
+      }
+    }
+  }
 
   return (
     <>
-      <BlockStats setRef={setRef}/>
-      <InfinityTable
-        onScroll={onScroll}
+      <TxsStats/>
+      <InfiniteTable
+        rows={txs}
         columns={txColumns}
-        rowKey="hash"
-        data={list}
-        loading={loading}
+        hasMore={hasMoreTxs}
+        loadMoreRows={fetchTxs}
       />
     </>
   )

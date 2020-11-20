@@ -6,7 +6,7 @@ import {displayAMOLong} from "../../util"
 import {TransactionSchema} from "../../reducer/blockchain"
 import {AxiosError} from "axios"
 import {
-  txColumns2,
+  txColumns,
   incentiveColumns,
   penaltyColumns
 } from "../../component/columns"
@@ -44,8 +44,10 @@ const infoColumns = [
 ]
 
 const Account = () => {
-  const chainId = useChainId()
   const dispatch = useDispatch()
+  const chainId = useChainId()
+
+  // first section
   const {address} = useParams()
   const [account, setAccount] = useState<AccountInfo>({
     address: address as string,
@@ -60,6 +62,7 @@ const Account = () => {
   })
   const [statLoading, setStatLoading] = useState(true)
 
+  // second section
   const [tab, setTab] = useState<number>(0)
   const [txs, setTxs] = useState<TransactionSchema[]>([])
   const [incentives, setIncentives] = useState<Incentive[]>([])
@@ -149,7 +152,7 @@ const Account = () => {
         <div hidden={tab !== 0}>
           <InfiniteTable
             rows={txs}
-            columns={txColumns2}
+            columns={txColumns}
             hasMore={hasMoreTxs}
             loadMoreRows={fetchAccountTransactions}
           />

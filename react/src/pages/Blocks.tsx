@@ -1,73 +1,59 @@
 import React, {useCallback, useEffect, useMemo, useState} from 'react'
-import {BlockInfo} from "../reducer/blocks"
-import {useChainId} from "../reducer"
-import {Grid} from "@material-ui/core"
-import InfinityTable from "../component/InfinityTable"
 import ExplorerAPI from '../ExplorerAPI'
-import {Link} from "react-router-dom"
-import StatCard from "../component/StatCard"
-import {History, Timeline, TrendingUp, ViewModule} from "@material-ui/icons"
+import InfiniteTable from "../component/InfiniteTable"
 import SizeTitle, {LastOptions} from "../component/SizeTitle"
-import useScrollUpdate from "../hooks/useScrollUpdate"
+import StatCard from "../component/StatCard"
 import moment from 'moment'
+import {BlockInfo} from "../reducer/blocks"
+import {Grid} from "@material-ui/core"
+import {History, Timeline, TrendingUp, ViewModule} from "@material-ui/icons"
+import {Link} from "react-router-dom"
+import {useChainId, useHeight} from "../reducer"
 
 const columns = [
   {
     key: 'height',
     label: 'Height',
-    width: 100,
-    flexGrow: 1,
-    columnData: {
-      format: (height: number, chainId: string) => {
-        return (
-          <Link to={`/${chainId}/inspect/block/${height}`}>
-            {height}
-          </Link>
-        )
-      }
+    style: {width: 100, flexGrow: 1},
+    format: (height: number, chainId: string) => {
+      return (
+        <Link to={`/${chainId}/inspect/block/${height}`}>
+          {height}
+        </Link>
+      )
     }
   },
   {
     key: 'time',
     label: 'Time',
-    width: 100,
-    flexGrow: 5,
-    columnData: {
-      format: (time: string, chainId: string, data: BlockInfo) => {
-        return (
-          `${moment(time).format("YYYY-MM-DD HH:mm:ss.SSS ZZ")} (+${data.interval.toFixed(3)} sec)`
-        )
-      }
+    style: {width: 100, flexGrow: 5},
+    format: (time: string, chainId: string) => {
+      // TODO: display interval
+      return (
+        `${moment(time).format("YYYY-MM-DD HH:mm:ss.SSS ZZ")}`
+      )
     }
   },
   {
     key: 'proposer',
     label: 'Proposer',
-    width: 100,
-    flexGrow: 10,
-    columnData: {
-      format: (validator: string, chainId: string) => {
-        return (
-          <Link to={`/${chainId}/inspect/validator/${validator}`}>
-            <code>{validator}</code>
-          </Link>
-        )
-      }
+    style: {width: 100, flexGrow: 10},
+    format: (validator: string, chainId: string) => {
+      return (
+        <Link to={`/${chainId}/inspect/validator/${validator}`}>
+          <code>{validator}</code>
+        </Link>
+      )
     }
   },
   {
     key: 'num_txs',
     label: "# of Txs",
-    width: 100,
-    flexGrow: 1
+    style: {width: 100, flexGrow: 1}
   }
 ]
 
-type BlocksStatProps = {
-  setRef: (instance?: HTMLDivElement) => void
-}
-
-const BlocksStatView = (props: BlocksStatProps) => {
+const BlocksStatView = () => {
   const [blocksStat, setBlocksStat] = useState<BlockStat>({
     chain_id: 'amo-cherrryblossom-01',
     last_height: 1,
@@ -106,7 +92,6 @@ const BlocksStatView = (props: BlocksStatProps) => {
       <StatCard
         title={title}
         size="large"
-        setRef={props.setRef}
       >
         <Grid
           container
@@ -152,35 +137,42 @@ const BlocksStatView = (props: BlocksStatProps) => {
 }
 
 const Blocks = () => {
-  const [ref, setRef] = useState<HTMLDivElement | undefined>(undefined)
+  const chainId = useChainId()
+  const lastHeight = useHeight()
 
-  const fetchBlocks = useCallback(async (size: number, fixedHeight: number, chainId: string) => {
-    if (fixedHeight !== -1) {
-      const nextHeight = fixedHeight - size
+  // first section
 
-      if (nextHeight <= 0) {
-        return []
-      }
+  // second section
+  const [blocks, setBlocks] = useState<BlockInfo[]>([])
+  const [hasMoreBlocks, setHasMoreBlocks] = useState<boolean>(false)
 
-      const {data} = await ExplorerAPI.fetchBlocks(chainId, nextHeight)
-      return data
+  useEffect(() => {
+    setBlocks([])
+    if (chainId && lastHeight) {
+      setHasMoreBlocks(true)
     }
+  }, [chainId, lastHeight])
 
-    return null
-  }, [])
-  const [blocks, loading, onScroll] = useScrollUpdate<BlockInfo>(fetchBlocks, ref)
+  const fetchBlocks = async (from: number, num: number) => {
+    if (chainId && hasMoreBlocks) {
+      const {data} = await ExplorerAPI
+        .fetchBlocks(chainId, lastHeight, from, num)
+      if (data.length > 0) {
+        setBlocks(blocks.concat(data))
+      } else {
+        setHasMoreBlocks(false)
+      }
+    }
+  }
 
   return (
     <>
-      <BlocksStatView
-        setRef={setRef}
-      />
-      <InfinityTable<BlockInfo>
-        onScroll={onScroll}
+      <BlocksStatView/>
+      <InfiniteTable
+        rows={blocks}
         columns={columns}
-        rowKey={'hash'}
-        data={blocks}
-        loading={loading}
+        hasMore={hasMoreBlocks}
+        loadMoreRows={fetchBlocks}
       />
     </>
   )

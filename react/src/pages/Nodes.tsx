@@ -58,15 +58,17 @@ const Nodes = () => {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    ExplorerAPI
-      .fetchNodes(chainId, 3600)
-      .then(({data}) => {
-        setNodes(data)
-        setLoading(false)
-      })
-      .catch(() => {
-        setLoading(false)
-      })
+    if (chainId) {
+      ExplorerAPI
+        .fetchNodes(chainId, 3600)
+        .then(({data}) => {
+          setNodes(data)
+          setLoading(false)
+        })
+        .catch(() => {
+          setLoading(false)
+        })
+    }
   }, [chainId])
 
   return (
