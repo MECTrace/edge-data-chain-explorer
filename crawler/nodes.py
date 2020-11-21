@@ -53,7 +53,7 @@ class Nodes:
             db = dbproxy.connect_db()
         self.db = db
 
-        lock = FileLock('/var/tmp/nodes-{self.chain_id}.lock')
+        lock = FileLock(f'/var/tmp/nodes-{self.chain_id}.lock')
         try:
             lock.acquire(timeout=1)
         except Timeout:
