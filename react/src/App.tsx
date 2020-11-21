@@ -29,6 +29,7 @@ import Inspect from "./pages/Inspect"
 import Transactions from "./pages/Transactions"
 import Blocks from "./pages/Blocks"
 import Validators from "./pages/Validators"
+import Governance from "./pages/Governance"
 import Storages from "./pages/Storages"
 import Nodes from "./pages/Nodes"
 import Footer from "./component/Footer"
@@ -80,6 +81,10 @@ const routers: RouteProps[] = [
   {
     path: '/:chainId/validators',
     component: Validators
+  },
+  {
+    path: '/:chainId/governance',
+    component: Governance
   },
   {
     path: '/:chainId/storages',

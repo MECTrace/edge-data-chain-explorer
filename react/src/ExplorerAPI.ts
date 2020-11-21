@@ -2,7 +2,9 @@ import Axios, {AxiosResponse} from "axios"
 import {BlockInfo} from "./reducer/blocks"
 import {TransactionSchema} from "./reducer/blockchain"
 
-const defaultURL = "https://explorer.amolabs.io/api"
+//const defaultURL = "https://explorer.amolabs.io/api"
+const defaultURL = "http://amo-crawler:3000"
+//const defaultURL = "http://localhost:3001"
 
 const client = Axios.create({
   baseURL: defaultURL
@@ -91,14 +93,22 @@ const fetchBlockchain = (chainId: string, blocks: number = 1000, txs: number = 1
     .get(`/chain/${chainId}?num_blks=${blocks}&num_txs=${txs}`)
 }
 
-const fetchDrafts = (chainId: string, from: number, size: number = 20): Result<Draft[]> => {
+const fetchDraftStat = (chainId: string): Result<DraftStat> => {
+  return client.get(`/chain/${chainId}/drafts?stat`)
+}
+
+const fetchDrafts = (chainId: string, anchor: number, from: number, num = 20): Result<Draft[]> => {
   return client
-    .get(`/chain/${chainId}/drafts`)
+    .get(`/chain/${chainId}/drafts?anchor=${anchor}&from=${from}&num=${num}`)
 }
 
 const fetchDraft = (chainId: string, draftId: number): Result<Draft> => {
   return client
     .get(`/chain/${chainId}/drafts/${draftId}`)
+}
+
+const fetchChainConfig = (chainId: string): Result<ChainConfig> => {
+  return client.get(`/chain/${chainId}/config`)
 }
 
 const fetchStorageStat = (chainId: string): Result<StorageStat> => {
@@ -154,8 +164,10 @@ export default {
   fetchBlockchain,
   fetchTxStat,
   fetchDelegators,
+  fetchDraftStat,
   fetchDrafts,
   fetchDraft,
+  fetchChainConfig,
   fetchStorageStat,
   fetchStorages,
   fetchStorage,

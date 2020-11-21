@@ -113,7 +113,7 @@ type Penalty = {
 }
 
 // https://github.com/amolabs/docs/blob/master/protocol.md#top-level-data
-interface DraftConfig {
+interface ChainConfig {
   max_validators?: number
   weight_validator?: number
   weight_delegator?: number
@@ -137,11 +137,16 @@ interface DraftConfig {
   upgrade_protocol_version?: number
 }
 
+interface DraftStat {
+  num_drafts: number
+  num_passed: number
+}
+
 interface Draft {
   chain_id: string
   draft_id: number
   proposer: string
-  config: DraftConfig
+  config: ChainConfig
   desc: string
   open_count: number
   close_count: number
