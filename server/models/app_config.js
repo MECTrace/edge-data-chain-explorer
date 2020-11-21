@@ -5,14 +5,31 @@ async function getLast(chain_id) {
   return new Promise(function(resolve, reject) {
     var query_str;
     var query_var;
-    query_str = "select * from s_drafts \
-      where (chain_id = ?) and (draft_id = ?) order by draft_id desc limit 1";
-    query_var = [chain_id, draft_id];
-    db.query(query_str, query_var, function (err, rows, fields) {
+    query_str = "SELECT `genesis` FROM `c_genesis` WHERE (`chain_id` = ?)";
+    query_var = [chain_id];
+    db.query(query_str, query_var, function (err, rows) {
       if (err) {
         return reject(err);
       }
-      resolve(rows[0].config);
+      if (rows.length == 0) {
+        return reject('no genesis');
+      }
+      // `genesis` is a JSON object
+      let config = JSON.parse(rows[0].genesis).app_state.config;
+
+      // filter applied drafts only
+      query_str = "SELECT `config` FROM `s_drafts` \
+        WHERE `chain_id` = ? AND `applied_at` > 0 ORDER BY `draft_id`";
+      query_var = [chain_id];
+      db.query(query_str, query_var, function (err, rows) {
+        if (err) {
+          return reject(err);
+        }
+        rows.forEach(r => {
+          config = {...config, ...JSON.parse(r.config)};
+        });
+        return resolve(config);
+      });
     });
   });
 }

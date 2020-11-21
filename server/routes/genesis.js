@@ -22,7 +22,7 @@ router.get('/', function(req, res) {
   const chain_id = res.locals.chain_id;
   var query_str;
   var query_var;
-  query_str = "select * from c_genesis where (chain_id = ?)";
+  query_str = "SELECT `genesis` FROM `c_genesis` WHERE (`chain_id` = ?)";
   query_var = [chain_id];
   db.query(query_str, query_var, function (err, rows, fields) {
     if (err) {
@@ -31,7 +31,9 @@ router.get('/', function(req, res) {
     }
     if (rows.length > 0) {
       res.status(200);
-      res.send(rows[0].genesis);
+      // row.genesis is of string type. We need to parse it to an object to
+      // make the response content type to be handled automatically.
+      res.send(JSON.parse(rows[0].genesis));
     } else {
       res.status(404);
       res.send('not found');

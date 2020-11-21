@@ -22,9 +22,9 @@ const appConfig = require('../models/app_config');
 router.get('/', function(req, res) {
   const chain_id = res.locals.chain_id;
   appConfig.getLast(chain_id)
-    .then((row) => {
+    .then((ret) => {
       res.status(200);
-      res.send(row);
+      res.send(ret);
     })
     .catch((err) => {
       res.status(500);
