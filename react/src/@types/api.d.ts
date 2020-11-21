@@ -70,6 +70,10 @@ type ValidatorStat = {
   num_validators: number
 }
 
+type NodeStat = {
+  num_nodes: number,
+}
+
 type NodeInfo = {
   node_id: string,
   moniker: string,
@@ -80,6 +84,10 @@ type NodeInfo = {
   elapsed: number,
   timestamp: string,
   uptime: number,
+}
+
+type StorageStat = {
+  num_storages: number,
 }
 
 type StorageInfo = {

@@ -56,19 +56,30 @@ const columns = [
 
 const Storages = () => {
   const chainId = useChainId()
-  const [loading, setLoading] = useState(true)
+  const [stat, setStat] = useState<StorageStat>({ num_storages: 0 })
+  const [statLoading, setStatLoading] = useState(true)
   const [storages, setStorages] = useState<StorageInfo[]>([])
 
   useEffect(() => {
-    ExplorerAPI
-      .fetchStorages(chainId)
-      .then(({data}) => {
-        setStorages(data)
-        setLoading(false)
-      })
-      .catch(() => {
-        setLoading(false)
-      })
+    if (chainId) {
+      ExplorerAPI
+        .fetchStorageStat(chainId)
+        .then(({data}) => {
+          setStat(data)
+          setStatLoading(false)
+        })
+        .catch(() => {
+          setStatLoading(false)
+        })
+
+      ExplorerAPI
+        .fetchStorages(chainId)
+        .then(({data}) => {
+          setStorages(data)
+        })
+        .catch(() => {
+        })
+    }
   }, [chainId])
 
   return (
@@ -86,7 +97,7 @@ const Storages = () => {
             title={"# of Storages"}
             color="#FF6E4A"
           >
-            {1}
+            {stat.num_storages}
           </StatCard>
         </Grid>
       </StatCard>
@@ -95,7 +106,7 @@ const Storages = () => {
         columns={columns}
         rowKey="storage_id"
         fallbackText="No storages"
-        loading={loading}
+        loading={statLoading}
       />
     </>
   )

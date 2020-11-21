@@ -101,6 +101,10 @@ const fetchDraft = (chainId: string, draftId: number): Result<Draft> => {
     .get(`/chain/${chainId}/drafts/${draftId}`)
 }
 
+const fetchStorageStat = (chainId: string): Result<StorageStat> => {
+  return client.get(`chain/${chainId}/storages?stat`)
+}
+
 const fetchStorages = (chainId: string): Result<StorageInfo[]> => {
   return client
     .get(`chain/${chainId}/storages`)
@@ -123,6 +127,10 @@ const fetchAccountPenalties = (
     Result<Penalty[]> => {
   return client
     .get(`chain/${chainId}/penalties/${address}?from=${from}&num=${num}`)
+}
+
+const fetchNodeStat = (chainId: string): Result<NodeStat> => {
+  return client.get(`chain/${chainId}/nodes?stat`)
 }
 
 const fetchNodes = (chainId: string, range: number = 3600, from: number = 0, num: number = 20): Result<NodeInfo[]> => {
@@ -148,9 +156,11 @@ export default {
   fetchDelegators,
   fetchDrafts,
   fetchDraft,
+  fetchStorageStat,
   fetchStorages,
   fetchStorage,
   fetchAccountIncentives,
   fetchAccountPenalties,
+  fetchNodeStat,
   fetchNodes,
 }

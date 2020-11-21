@@ -54,19 +54,28 @@ const columns = [
 
 const Nodes = () => {
   const chainId = useChainId()
+  const [stat, setStat] = useState<NodeStat>({ num_nodes: 0 })
+  const [statLoading, setStatLoading] = useState(true)
   const [nodes, setNodes] = useState<NodeInfo[]>([])
-  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     if (chainId) {
       ExplorerAPI
+        .fetchNodeStat(chainId)
+        .then(({data}) => {
+          setStat(data)
+          setStatLoading(false)
+        })
+        .catch(() => {
+          setStatLoading(false)
+        })
+
+      ExplorerAPI
         .fetchNodes(chainId, 3600)
         .then(({data}) => {
           setNodes(data)
-          setLoading(false)
         })
         .catch(() => {
-          setLoading(false)
         })
     }
   }, [chainId])
@@ -83,10 +92,10 @@ const Nodes = () => {
         >
           <StatCard
             icon={AccountBalance}
-            title={"# of nodes"}
+            title={"# of Nodes"}
             color="#FF6E4A"
           >
-            {/*stat.num_validators*/ 1}
+            {stat.num_nodes}
           </StatCard>
         </Grid>
       </StatCard>
@@ -95,7 +104,7 @@ const Nodes = () => {
         columns={columns}
         rowKey="node_id"
         fallbackText="No nodes"
-        loading={loading}
+        loading={statLoading}
       />
     </>
   )
