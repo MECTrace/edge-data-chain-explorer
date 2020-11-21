@@ -119,14 +119,14 @@ const fetchAccountIncentives = (
   chainId: string, address: string, top: number, from: number, num: number):
     Result<Incentive[]> => {
   return client
-    .get(`chain/${chainId}/incentives/${address}?top=${top}&from=${from}&num=${num}`)
+    .get(`chain/${chainId}/accounts/${address}/incentives?top=${top}&from=${from}&num=${num}`)
 }
 
 const fetchAccountPenalties = (
   chainId: string, address: string, top: number, from: number, num: number):
     Result<Penalty[]> => {
   return client
-    .get(`chain/${chainId}/penalties/${address}?from=${from}&num=${num}`)
+    .get(`chain/${chainId}/accounts/${address}/penalties?from=${from}&num=${num}`)
 }
 
 const fetchNodeStat = (chainId: string): Result<NodeStat> => {
