@@ -2,6 +2,7 @@
 var express = require('express');
 var router = express.Router();
 const node = require('../models/node');
+const stat = require('../models/stat');
 
 /**
  * @swagger
@@ -11,6 +12,14 @@ const node = require('../models/node');
  *     in: path 
  *     type: string
  *     required: true
+ *   NodeStat:
+ *     type: object
+ *     properties:
+ *       chain_id:
+ *         type: string
+ *       num_nodes:
+ *         type: integer
+ *         description: number of nodes
  *   NodeInfo:
  *     type: object
  *     properties:
@@ -88,23 +97,52 @@ function dateToStr(target) {
  *               type: array
  *               items:
  *                 $ref: '#/definitions/NodeInfo'
+ *
+ * @swagger
+ * /chain/{chain_id}/nodes?stat:
+ *   parameters:
+ *     - $ref: '#/definitions/ChainId'
+ *   get:
+ *     tags:
+ *       - nodes
+ *     description: Get node stat
+ *     produces:
+ *       - application/json
+ *     responses:
+ *       200:
+ *         description: Node stat
+ *         content:
+ *           application:/json:
+ *             schema:
+ *               $ref: '#/definitions/NodeStat'
  */
 router.get('/', function(req, res) {
   const chain_id = res.locals.chain_id;
-  const range = req.query.range || 60; // seconds
+  if ('stat' in req.query) {
+    stat.getNodeStat(chain_id)
+      .then((ret) => {
+        res.status(200);
+        res.send(ret);
+      })
+      .catch((err) => {
+        res.status(500);
+        res.send(err);
+      });
+  } else {
+    const range = req.query.range || 60; // seconds
+    const to = dateToStr(new Date());
+    const from = dateToStr(new Date(Date.parse(to) - range * 1000));
 
-  const to = dateToStr(new Date());
-  const from = dateToStr(new Date(Date.parse(to) - range * 1000));
-
-  node.getList(chain_id, from, to)
-    .then((row) => {
-      res.status(200);
-      res.send(row);
-    })
-    .catch((err) => {
-      res.status(500);
-      res.send(err);
-    });
+    node.getList(chain_id, from, to)
+      .then((row) => {
+        res.status(200);
+        res.send(row);
+      })
+      .catch((err) => {
+        res.status(500);
+        res.send(err);
+      });
+  }
 });
 
 /**

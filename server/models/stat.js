@@ -137,10 +137,40 @@ async function getDraftStat(chain_id) {
   });
 }
 
+async function getStorageStat(chain_id) {
+  return new Promise(function(resolve, reject) {
+    var query_str = "SELECT count(*) `num_storages` FROM `s_storages` \
+      WHERE (`chain_id` = ?)";
+    var query_var = [chain_id];
+    db.query(query_str, query_var, function (err, rows) {
+      if (err) {
+        return reject(err);
+      }
+      resolve(rows[0]);
+    });
+  });
+}
+
+async function getNodeStat(chain_id) {
+  return new Promise(function(resolve, reject) {
+    var query_str = "SELECT count(*) `num_nodes` FROM `nodes` \
+      WHERE (`chain_id` = ?)";
+    var query_var = [chain_id];
+    db.query(query_str, query_var, function (err, rows) {
+      if (err) {
+        return reject(err);
+      }
+      resolve(rows[0]);
+    });
+  });
+}
+
 module.exports = {
   getBlockStat: getBlockStat,
   getTxStat: getTxStat,
   getAssetStat: getAssetStat,
   getValidatorStat: getValidatorStat,
   getDraftStat: getDraftStat,
+  getStorageStat,
+  getNodeStat,
 }

@@ -41,7 +41,6 @@ async function getOne(chain_id, storage_id) {
 }
 
 module.exports = {
-  //getStat: getStat,
   getList: getList,
   getOne: getOne,
 }

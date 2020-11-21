@@ -2,6 +2,7 @@
 var express = require('express');
 var router = express.Router();
 const storage = require('../models/storage');
+const stat = require('../models/stat');
 
 /**
  * @swagger
@@ -14,6 +15,14 @@ const storage = require('../models/storage');
  *     schema:
  *       type: integer
  *     style: simple
+ *   StorageStat:
+ *     type: object
+ *     properties:
+ *       chain_id:
+ *         type: string
+ *       num_storages:
+ *         type: integer
+ *         description: number of storages
  *   StorageInfo:
  *     type: object
  *     properties:
@@ -55,18 +64,48 @@ const storage = require('../models/storage');
  *               type: array
  *               items:
  *                 $ref: '#/definitions/StorageInfo'
+ *
+ * @swagger
+ * /chain/{chain_id}/storages?stat:
+ *   parameters:
+ *     - $ref: '#/definitions/ChainId'
+ *   get:
+ *     tags:
+ *       - data trade
+ *     description: Get storage stat
+ *     produces:
+ *       - application/json
+ *     responses:
+ *       200:
+ *         description: Storage stat
+ *         content:
+ *           application:/json:
+ *             schema:
+ *               $ref: '#/definitions/StorageStat'
  */
 router.get('/', function(req, res) {
   const chain_id = res.locals.chain_id;
-  storage.getList(chain_id)
-    .then((rows) => {
-      res.status(200);
-      res.send(rows);
-    })
-    .catch((err) => {
-      res.status(500);
-      res.send(err);
-    });
+  if ('stat' in req.query) {
+    stat.getStorageStat(chain_id)
+      .then((ret) => {
+        res.status(200);
+        res.send(ret);
+      })
+      .catch((err) => {
+        res.status(500);
+        res.send(err);
+      });
+  } else {
+    storage.getList(chain_id)
+      .then((rows) => {
+        res.status(200);
+        res.send(rows);
+      })
+      .catch((err) => {
+        res.status(500);
+        res.send(err);
+      });
+  }
 });
 
 /**
