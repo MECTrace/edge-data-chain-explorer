@@ -15,7 +15,7 @@ s_tables = ['s_requests', 's_usages', 's_parcels', 's_storages',
 
 def connect_db():
     # read config
-    config_dir = os.path.dirname(os.path.abspath(__file__)) + '/../db'
+    config_dir = os.path.dirname(os.path.abspath(__file__)) + '/../../db'
     dbconfigfile = config_dir + '/config.json'
     # print(dbconfigfile)
     try:

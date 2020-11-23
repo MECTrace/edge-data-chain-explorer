@@ -1,5 +1,5 @@
 /* vim: set sw=2 ts=2 expandtab : */
-var config = require('../config');
+var config = require('../../../db/config');
 var mysql = require('mysql');
 
 var param = config.db;
