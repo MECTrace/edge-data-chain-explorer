@@ -2,11 +2,12 @@ import React, {useEffect} from 'react'
 import StatCard from "../component/StatCard"
 import {AccountBalance, AccountBalanceWallet, History, Receipt, Timeline, ViewHeadline} from "@material-ui/icons"
 import {useDispatch, useSelector} from "react-redux"
-import {RootState} from "../reducer"
+import {RootState, useChainId, useHeight} from "../reducer"
 import {GraphState} from "../reducer/blockchain"
 import LinearGraph from "../component/LinearGraph"
 import CollapseTable from "../component/CollapseTable"
 import {BlockInfo, FETCH_RECENT_BLOCKS} from "../reducer/blocks"
+import {UPDATE_BLOCKCHAIN} from "../reducer/blockchain"
 import moment from 'moment'
 import {Link} from "react-router-dom"
 import {Grid} from "@material-ui/core"
@@ -46,7 +47,7 @@ const columns = [
 ]
 
 const RecentBlocks = () => {
-  const height = useSelector<RootState, number>(state => state.blockchain.blockState.height)
+  const height = useHeight()
   const blocks = useSelector<RootState, BlockInfo[]>(state => state.blocks.blocks)
 
   const dispatch = useDispatch()
@@ -117,7 +118,18 @@ const ValidatorStats = () => {
 }
 
 const Dashboard = () => {
+  const dispatch = useDispatch()
+  const chainId = useChainId()
   const blockState = useSelector<RootState, any>(state => state.blockchain.blockState)
+
+  useEffect(() => {
+    if (chainId) {
+      const handler = setInterval(() => {
+        dispatch({type: UPDATE_BLOCKCHAIN})
+      }, 5000)
+      return () => clearInterval(handler)
+    }
+  }, [chainId, dispatch])
 
   return (
     <>

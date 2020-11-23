@@ -260,18 +260,7 @@ function App() {
       dispatch(replace(`/${newChainId}/`))
     }
 
-    const updateBlockchain = () => {
-      if (newChainId === chainId || newChainId === '') {
-        dispatch({type: UPDATE_BLOCKCHAIN})
-      }
-    }
-
-    updateBlockchain()
-    const handler = setInterval(() => {
-      updateBlockchain()
-    }, 3000)
-
-    return () => clearInterval(handler)
+    dispatch({type: UPDATE_BLOCKCHAIN})
   }, [dispatch, networks, path, chainId])
 
   return (
