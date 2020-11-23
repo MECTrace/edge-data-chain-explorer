@@ -136,6 +136,39 @@ CREATE TABLE `c_txs` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 
+-- explorer.r_account_block definition
+
+CREATE TABLE `r_account_block` (
+  `seq` int(11) NOT NULL AUTO_INCREMENT,
+  `chain_id` char(32) NOT NULL,
+  `address` char(40) NOT NULL,
+  `height` int(11) NOT NULL,
+  `amount` char(40) NOT NULL DEFAULT '0',
+  PRIMARY KEY (`seq`),
+  KEY `r_account_block_FK` (`chain_id`,`address`),
+  KEY `r_account_block_FK_1` (`chain_id`,`height`),
+  CONSTRAINT `r_account_block_FK` FOREIGN KEY (`chain_id`, `address`) REFERENCES `s_accounts` (`chain_id`, `address`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `r_account_block_FK_1` FOREIGN KEY (`chain_id`, `height`) REFERENCES `c_blocks` (`chain_id`, `height`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=1109313 DEFAULT CHARSET=utf8mb4;
+
+
+-- explorer.r_account_tx definition
+
+CREATE TABLE `r_account_tx` (
+  `seq` int(11) NOT NULL AUTO_INCREMENT,
+  `chain_id` char(32) NOT NULL,
+  `address` char(40) NOT NULL,
+  `height` int(11) NOT NULL,
+  `index` int(11) NOT NULL,
+  `amount` char(40) NOT NULL DEFAULT '0',
+  PRIMARY KEY (`seq`),
+  KEY `r_account_tx_FK` (`chain_id`,`address`),
+  KEY `r_account_tx_FK_1` (`chain_id`,`height`,`index`),
+  CONSTRAINT `r_account_tx_FK` FOREIGN KEY (`chain_id`, `address`) REFERENCES `s_accounts` (`chain_id`, `address`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `r_account_tx_FK_1` FOREIGN KEY (`chain_id`, `height`, `index`) REFERENCES `c_txs` (`chain_id`, `height`, `index`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=6453 DEFAULT CHARSET=utf8mb4;
+
+
 -- explorer.s_drafts definition
 
 CREATE TABLE `s_drafts` (
@@ -280,4 +313,20 @@ CREATE TABLE `node_history` (
   `online` boolean NOT NULL default false,
   PRIMARY KEY (`chain_id`, `node_id`, `timestamp`),
   CONSTRAINT `nodes_FK` FOREIGN KEY (`chain_id`, `node_id`) REFERENCES `nodes` (`chain_id`, `node_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+
+-- explorer.r_parcel_tx definition
+
+CREATE TABLE `r_parcel_tx` (
+  `seq` int(11) NOT NULL AUTO_INCREMENT,
+  `chain_id` char(32) NOT NULL,
+  `parcel_id` char(72) NOT NULL,
+  `height` int(11) NOT NULL,
+  `index` int(11) NOT NULL,
+  PRIMARY KEY (`seq`),
+  KEY `r_parcel_tx_FK` (`chain_id`,`parcel_id`),
+  KEY `r_parcel_tx_FK_1` (`chain_id`,`height`,`index`),
+  CONSTRAINT `r_parcel_tx_FK` FOREIGN KEY (`chain_id`, `parcel_id`) REFERENCES `s_parcels` (`chain_id`, `parcel_id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `r_parcel_tx_FK_1` FOREIGN KEY (`chain_id`, `height`, `index`) REFERENCES `c_txs` (`chain_id`, `height`, `index`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
