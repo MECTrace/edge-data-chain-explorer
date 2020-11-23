@@ -15,7 +15,7 @@ services:
       - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql
 
   amo-exp-crawler:
-    build: ./crawler
+    build: ./server/crawler
     restart: always
     depends_on:
       - amo-exp-db
@@ -27,7 +27,7 @@ services:
       - tmp-volume:/var/tmp/
 
   amo-exp-api:
-    build: ./server
+    build: ./server/api
     restart: always
     depends_on:
       - amo-exp-crawler 
@@ -37,7 +37,7 @@ services:
       - "3000:3000"
 
   amo-exp-web:
-    build: ./react
+    build: ./web
     restart: always
     depends_on:
       - amo-exp-api 
