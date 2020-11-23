@@ -3,6 +3,7 @@ var express = require('express');
 var router = express.Router();
 const account = require('../models/account');
 const tx = require('../models/tx');
+const relation = require('../models/relation');
 const handleAccountIncentives = require('./incentives').handleAccountIncentives;
 const handleAccountPenalties = require('./penalties').handleAccountPenalties;
 
@@ -52,6 +53,25 @@ const handleAccountPenalties = require('./penalties').handleAccountPenalties;
  *       eff_stake:
  *         type: string
  *         description: quoted decimal number
+ *   BalanceChange:
+ *     type: object
+ *     properties:
+ *       chain_id:
+ *         type: string
+ *       address:
+ *         type: string
+ *       height:
+ *         type: integer
+ *       index:
+ *         type: integer
+ *         description: when `type` is 'block', `index` is `null`
+ *         nullabe: true
+ *       amount:
+ *         type: string
+ *         description: quoted decimal number
+ *       type:
+ *         type: string
+ *         description: one of 'tx_fee', 'block' and `type` of tx
  */
 
 /**
@@ -227,5 +247,70 @@ router.get('/:address([a-fA-F0-9]+)/incentives', handleAccountIncentives);
  *     description: Alias of `/chain/{chain_id}/penalties/{address}`
  */
 router.get('/:address([a-fA-F0-9]+)/penalties', handleAccountPenalties);
+
+/**
+ * @swagger
+ * /chain/{chain_id}/accounts/{address}/history:
+ *   parameters:
+ *     - $ref: '#/definitions/ChainId'
+ *     - $ref: '#/definitions/Address'
+ *     - name: top
+ *       in: query
+ *       description: anchor height to query (0 value means last block)
+ *       schema:
+ *         type: integer
+ *         default: 0
+ *     - name: from
+ *       in: query
+ *       description: offset from the result
+ *       schema:
+ *         type: integer
+ *         default: 0
+ *     - name: num
+ *       in: query
+ *       description: number of items to retrieve
+ *       schema:
+ *         type: integer
+ *         default: 20
+ *     - name: tx_only
+ *       in: query
+ *       description: when true retrieve tx history only, otherwise retrieve
+ *         block events also
+ *       schema:
+ *         type: boolean
+ *         default: false
+ *   get:
+ *     tags:
+ *       - accounts
+ *     description: Get change history of the account balance
+ *     produces:
+ *       - application/json
+ *     responses:
+ *       200:
+ *         description: balance history
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/definitions/BalanceChange'
+ */
+router.get('/:address([a-fA-F0-9]+)/history', function(req, res) {
+  const chain_id = res.locals.chain_id;
+  var top = req.query.top || 0;
+  var from = req.query.from || 0;
+  var num = req.query.num || 20;
+  var tx_only = 'tx_only' in req.query;
+  const address = req.params.address;
+  relation.getAccountHistory(chain_id, address, top, from, num, tx_only)
+    .then((rows) => {
+      res.status(200);
+      res.send(rows);
+    })
+    .catch((err) => {
+      res.status(500);
+      res.send(err);
+    });
+});
 
 module.exports = router;
