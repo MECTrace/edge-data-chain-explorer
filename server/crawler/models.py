@@ -551,3 +551,20 @@ class RelAccountTx:
                 WHERE (`chain_id` = %(chain_id)s AND `address` = %(address)s
                     AND `height` = %(height)s AND `index` = %(index)s)
                 """, values)
+
+
+class RelParcelTx:
+    def __init__(self, chain_id, parcel_id, height, index, cursor):
+        self.chain_id = chain_id
+        self.parcel_id = parcel_id
+        self.height = height
+        self.index = index
+
+    def save(self, cursor):
+        values = vars(self).copy()
+        cursor.execute(
+            """
+            INSERT INTO `r_parcel_tx` (
+                `chain_id`, `parcel_id`, `height`, `index`)
+            VALUES (%(chain_id)s, %(parcel_id)s, %(height)s, %(index)s)
+            """, values)
