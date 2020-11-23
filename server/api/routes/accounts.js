@@ -210,7 +210,9 @@ router.get('/:address([a-fA-F0-9]+)', function(req, res) {
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/definitions/TxInfo'
+ *               type: array
+ *               items:
+ *                 $ref: '#/definitions/TxInfo'
  */
 router.get('/:address([a-fA-F0-9]+)/txs', function(req, res) {
   const chain_id = res.locals.chain_id;
