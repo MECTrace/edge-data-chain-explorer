@@ -465,3 +465,89 @@ class UDCBalance:
                 AND `udc_id` = %(udc_id)s
                 AND `address` = %(address)s)
             """, values)
+
+
+class RelAccountBlock:
+    def __init__(self, chain_id, address, height, cursor):
+        self.chain_id = chain_id
+        self.address = address
+        self.height = height
+        self.amount = 0
+        cursor.execute(
+            """
+            SELECT * FROM `r_account_block`
+            WHERE (`chain_id` = %(chain_id)s AND `address` = %(address)s
+                AND `height` = %(height)s)
+            """, vars(self))
+        row = cursor.fetchone()
+        if row:
+            d = dict(zip(cursor.column_names, row))
+            self.amount = int(d['amount'])
+            self.new = False
+        else:
+            self.amount = 0
+            self.new = True
+
+    def save(self, cursor):
+        values = vars(self).copy()
+        values['amount'] = str(values['amount'])
+        if self.new and self.amount != 0:
+            cursor.execute(
+                """
+                INSERT INTO `r_account_block` (
+                    `chain_id`, `address`, `height`, `amount`)
+                VALUES (%(chain_id)s, %(address)s, %(height)s, %(amount)s)
+                """, values)
+        else:
+            cursor.execute(
+                """
+                UPDATE `r_account_block`
+                SET
+                    `amount` = %(amount)s
+                WHERE (`chain_id` = %(chain_id)s AND `address` = %(address)s
+                    AND `height` = %(height)s)
+                """, values)
+
+
+class RelAccountTx:
+    def __init__(self, chain_id, address, height, index, cursor):
+        self.chain_id = chain_id
+        self.address = address
+        self.height = height
+        self.index = index
+        self.amount = 0
+        cursor.execute(
+            """
+            SELECT * FROM `r_account_tx`
+            WHERE (`chain_id` = %(chain_id)s AND `address` = %(address)s
+                AND `height` = %(height)s AND `index` = %(index)s)
+            """, vars(self))
+        row = cursor.fetchone()
+        if row:
+            d = dict(zip(cursor.column_names, row))
+            self.amount = int(d['amount'])
+            self.new = False
+        else:
+            self.amount = 0
+            self.new = True
+
+    def save(self, cursor):
+        values = vars(self).copy()
+        values['amount'] = str(values['amount'])
+        if self.new and self.amount != 0:
+            cursor.execute(
+                """
+                INSERT INTO `r_account_tx` (
+                    `chain_id`, `address`, `height`, `index`, `amount`)
+                VALUES (%(chain_id)s, %(address)s, %(height)s, %(index)s,
+                    %(amount)s)
+                """, values)
+        else:
+            cursor.execute(
+                """
+                UPDATE `r_account_tx`
+                SET
+                    `amount` = %(amount)s
+                WHERE (`chain_id` = %(chain_id)s AND `address` = %(address)s
+                    AND `height` = %(height)s AND `index` = %(index)s)
+                """, values)

@@ -100,7 +100,6 @@ class Block:
                             (%(chain_id)s, %(height)s, %(protocol_version)s)
                         """, vs)
 
-
     def play_events_end(self, cursor):
         # events
         cursor.execute(
@@ -162,12 +161,15 @@ class Block:
                         VALUES
                             (%(chain_id)s, %(height)s, %(address)s, %(amount)s)
                         """, vs)
-                    recp = models.Account(self.chain_id,
-                                          ev['attr']['address'].strip('"'),
-                                          cursor)
+                    addr = ev['attr']['address'].strip('"')
+                    recp = models.Account(self.chain_id, addr, cursor)
                     recp.balance += int(ev['attr']['amount'].strip('"'))
                     asset_stat.active_coins += int(ev['attr']['amount'].strip('"'))
                     recp.save(cursor)
+                    rel = models.RelAccountBlock(self.chain_id, addr,
+                                                 self.height, cursor)
+                    rel.amount += int(ev['attr']['amount'].strip('"'))
+                    rel.save(cursor)
                 if ev['type'] == 'penalty':
                     vs = self._vars()
                     vs['address'] = ev['attr']['address'].strip('"')
@@ -196,11 +198,14 @@ class Block:
                         recp.save(cursor)
                         staker.save(cursor)
                 if ev['type'] == 'draft_deposit':
-                    recp = models.Account(self.chain_id,
-                                          ev['attr']['address'].strip('"'),
-                                          cursor)
+                    addr = ev['attr']['address'].strip('"')
+                    recp = models.Account(self.chain_id, addr, cursor)
                     recp.balance += int(ev['attr']['amount'].strip('"'))
                     recp.save(cursor)
+                    rel = models.RelAccountBlock(self.chain_id, addr,
+                                                 self.height, cursor)
+                    rel.amount += int(ev['attr']['amount'].strip('"'))
+                    rel.save(cursor)
                 asset_stat.save(cursor)
 
     def play_txs(self, cursor):

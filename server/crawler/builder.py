@@ -83,6 +83,12 @@ class Builder:
         self.print_log('REBUILD state db')
         cur = self.db.cursor()
 
+        for t in dbproxy.r_tables:
+            cur.execute(
+                f"DELETE FROM `{t}` WHERE `chain_id` = '{self.chain_id}'")
+            cur.execute("""OPTIMIZE TABLE `{t}`""")
+            cur.fetchall()
+
         for t in dbproxy.s_tables:
             cur.execute(
                 f"DELETE FROM `{t}` WHERE `chain_id` = '{self.chain_id}'")

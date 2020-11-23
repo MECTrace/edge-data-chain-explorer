@@ -80,6 +80,10 @@ class Tx:
                                           cursor)
                 proposer.balance -= draft.deposit
                 proposer.save(cursor)
+                rel = models.RelAccountTx(self.chain_id, draft.proposer,
+                                          self.height, self.index, cursor)
+                rel.amount -= draft.deposit
+                rel.save(cursor)
 
     """Save to DB
 
@@ -114,10 +118,18 @@ def tx_transfer(tx, cursor):
     sender = models.Account(tx.chain_id, tx.sender, cursor)
     sender.balance -= payload['amount']
     sender.save(cursor)
+    rel = models.RelAccountTx(tx.chain_id, tx.sender, tx.height, tx.index,
+                              cursor)
+    rel.amount -= payload['amount']
+    rel.save(cursor)
 
     recp = models.Account(tx.chain_id, payload['to'], cursor)
     recp.balance += payload['amount']
     recp.save(cursor)
+    rel = models.RelAccountTx(tx.chain_id, payload['to'], tx.height, tx.index,
+                              cursor)
+    rel.amount += payload['amount']
+    rel.save(cursor)
 
 
 def tx_stake(tx, cursor):
@@ -133,6 +145,10 @@ def tx_stake(tx, cursor):
     b = bytearray.fromhex(sender.val_pubkey)
     sender.val_addr = sha256(b).hexdigest()[:40].upper()
     sender.save(cursor)
+    rel = models.RelAccountTx(tx.chain_id, tx.sender, tx.height, tx.index,
+                              cursor)
+    rel.amount -= payload['amount']
+    rel.save(cursor)
 
     asset_stat = stats.Asset(tx.chain_id, cursor)
     asset_stat.active_coins -= payload['amount']
@@ -151,6 +167,10 @@ def tx_withdraw(tx, cursor):
     if sender.stake == 0:
         sender.val_addr = None
     sender.save(cursor)
+    rel = models.RelAccountTx(tx.chain_id, tx.sender, tx.height, tx.index,
+                              cursor)
+    rel.amount += payload['amount']
+    rel.save(cursor)
 
     asset_stat = stats.Asset(tx.chain_id, cursor)
     asset_stat.active_coins += payload['amount']
@@ -167,6 +187,10 @@ def tx_delegate(tx, cursor):
     sender.balance -= payload['amount']
     sender.del_addr = payload['to']
     sender.save(cursor)
+    rel = models.RelAccountTx(tx.chain_id, tx.sender, tx.height, tx.index,
+                              cursor)
+    rel.amount -= payload['amount']
+    rel.save(cursor)
 
     delegatee = models.Account(tx.chain_id, sender.del_addr, cursor)
     delegatee.eff_stake += payload['amount']
@@ -191,6 +215,10 @@ def tx_retract(tx, cursor):
     if sender.delegate == 0:
         sender.del_addr = None
     sender.save(cursor)
+    rel = models.RelAccountTx(tx.chain_id, tx.sender, tx.height, tx.index,
+                              cursor)
+    rel.amount += payload['amount']
+    rel.save(cursor)
 
     delegatee = models.Account(tx.chain_id, del_addr, cursor)
     delegatee.eff_stake -= payload['amount']
@@ -247,9 +275,17 @@ def tx_register(tx, cursor):
 
     owner.balance -= storage.registration_fee
     owner.save(cursor)
+    rel = models.RelAccountTx(tx.chain_id, owner.address, tx.height, tx.index,
+                              cursor)
+    rel.amount -= storage.registration_fee
+    rel.save(cursor)
 
     host.balance += storage.registration_fee
     host.save(cursor)
+    rel = models.RelAccountTx(tx.chain_id, host.address, tx.height, tx.index,
+                              cursor)
+    rel.amount += storage.registration_fee
+    rel.save(cursor)
 
 
 def tx_discard(tx, cursor):
@@ -281,6 +317,10 @@ def tx_request(tx, cursor):
         buyer.balance -= request.dealer_fee
     buyer.balance -= request.payment
     buyer.save(cursor)
+    rel = models.RelAccountTx(tx.chain_id, buyer.address, tx.height, tx.index,
+                              cursor)
+    rel.amount -= request.payment
+    rel.save(cursor)
 
 
 def tx_cancel(tx, cursor):
@@ -292,6 +332,10 @@ def tx_cancel(tx, cursor):
     buyer.balance += request.payment
     buyer.balance += request.dealer_fee
     buyer.save(cursor)
+    rel = models.RelAccountTx(tx.chain_id, buyer.address, tx.height, tx.index,
+                              cursor)
+    rel.amount += request.payment + request.dealer_fee
+    rel.save(cursor)
 
     request.delete(cursor)
 
@@ -319,9 +363,17 @@ def tx_grant(tx, cursor):
         dealer.save(cursor)
     owner.balance -= storage.hosting_fee
     owner.save(cursor)
+    rel = models.RelAccountTx(tx.chain_id, owner.address, tx.height, tx.index,
+                              cursor)
+    rel.amount -= storage.hosting_fee
+    rel.save(cursor)
 
     host.balance += storage.hosting_fee
     host.save(cursor)
+    rel = models.RelAccountTx(tx.chain_id, host.address, tx.height, tx.index,
+                              cursor)
+    rel.amount += storage.hosting_fee
+    rel.save(cursor)
 
     request.delete(cursor)
 
@@ -382,6 +434,7 @@ def tx_propose(tx, cursor):
     draft.desc = payload['desc']
     draft.proposed_at = tx.height
     draft.save(cursor)
+    # deposit will be hanlded by tx event 'draft'
 
 
 def tx_vote(tx, cursor):
