@@ -75,6 +75,34 @@ async function getAccountHistory(chain_id, address, top, from, num, tx_only) {
   });
 }
 
+async function getParcelHistory(chain_id, parcel_id, top, from, num) {
+  return new Promise(function(resolve, reject) {
+    top = Number(top);
+    from = Number(from);
+    num = Number(num);
+    var query_str;
+    var query_var;
+    query_str = "\
+      SELECT c_txs.* \
+      FROM r_parcel_tx rpt \
+        LEFT JOIN c_txs ON rpt.chain_id = c_txs.chain_id \
+        AND rpt.height = c_txs.height AND rpt.`index` = c_txs.`index` \
+      WHERE rpt.chain_id = ? \
+        AND rpt.`parcel_id` = ? \
+        AND rpt.height < ? \
+      ORDER BY `height` DESC, `index` DESC LIMIT ?, ? \
+    ";
+    query_var = [chain_id, parcel_id, top, from, num];
+    db.query(query_str, query_var, function(err, rows, fields) {
+      if (err) {
+        return reject(err);
+      }
+      resolve(rows);
+    });
+  });
+}
+
 module.exports = {
   getAccountHistory,
+  getParcelHistory,
 }
