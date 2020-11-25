@@ -18,11 +18,9 @@ module.exports = {
     },
     {
       name: 'chain',
-      description: 'chain',
     },
     {
       name: 'blocks',
-      description: 'blocks',
     },
     {
       name: 'txs',
@@ -30,11 +28,9 @@ module.exports = {
     },
     {
       name: 'accounts',
-      description: 'accounts',
     },
     {
       name: 'validators',
-      description: 'validators',
     },
     {
       name: 'governance',
@@ -42,15 +38,16 @@ module.exports = {
     },
     {
       name: 'incentives',
-      description: 'incentives',
     },
     {
       name: 'penalties',
-      description: 'penalties',
+    },
+    {
+      name: 'data trade',
     },
     {
       name: 'nodes',
-      description: 'nodes',
+      description: 'blockchain nodes',
     },
   ],
   basePath: '/',

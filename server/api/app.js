@@ -18,10 +18,10 @@ const swaggerOptions = {
     'routes/accounts.js',
     'routes/validators.js',
     'routes/drafts.js',
-    'routes/parcels.js',
-    'routes/storages.js',
     'routes/incentives.js',
     'routes/penalties.js',
+    'routes/storages.js',
+    'routes/parcels.js',
     'routes/nodes.js',
   ]
 }
