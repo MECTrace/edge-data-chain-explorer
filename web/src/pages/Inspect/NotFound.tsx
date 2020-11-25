@@ -37,6 +37,12 @@ const message = (errorType: string, searchText: string) => {
           Transaction #{searchText}
         </h2>
       )
+    case 'DRAFT':
+      return (
+        <h2>
+          Draft #{searchText}
+        </h2>
+      )
     default:
       return ``
   }

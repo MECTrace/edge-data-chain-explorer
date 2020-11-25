@@ -107,6 +107,11 @@ const fetchDraft = (chainId: string, draftId: number): Result<Draft> => {
     .get(`/chain/${chainId}/drafts/${draftId}`)
 }
 
+const fetchVotes = (chainId: string, draftId: number): Result<Vote[]> => {
+  return client
+    .get(`/chain/${chainId}/drafts/${draftId}/votes`)
+}
+
 const fetchChainConfig = (chainId: string): Result<ChainConfig> => {
   return client.get(`/chain/${chainId}/config`)
 }
@@ -167,6 +172,7 @@ export default {
   fetchDraftStat,
   fetchDrafts,
   fetchDraft,
+  fetchVotes,
   fetchChainConfig,
   fetchStorageStat,
   fetchStorages,

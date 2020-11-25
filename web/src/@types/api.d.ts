@@ -156,3 +156,11 @@ interface Draft {
   tally_reject: string
   tally_deposit: string
 }
+
+interface Vote {
+  chain_id: string
+  draft_id: number
+  voter: string
+  approve: boolean
+  tally: string
+}

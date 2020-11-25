@@ -96,3 +96,26 @@ export const penaltyColumns = [
     }
   },
 ]
+
+export const voteColumns = [
+  {
+    key: 'voter',
+    label: 'Voter',
+    width: 100,
+    format: displayAddress,
+  },
+  {
+    key: 'approve',
+    label: 'Approve',
+    width: 100,
+    format: (approve: boolean) => {
+      return approve ? 'Yay' : 'Nay'
+    }
+  },
+  {
+    key: 'tally',
+    label: 'Tally',
+    width: 100,
+    format: displayAMO,
+  },
+]
