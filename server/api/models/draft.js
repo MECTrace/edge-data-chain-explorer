@@ -26,6 +26,9 @@ async function getOne(chain_id, draft_id) {
       if (err) {
         return reject(err);
       }
+      if (rows.length == 0) {
+        return resolve();
+      }
       elaborate(rows[0]);
       resolve(rows[0]);
     });
