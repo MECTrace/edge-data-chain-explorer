@@ -1,23 +1,26 @@
 /* vim: set sw=2 ts=2 expandtab : */
 const db = require('../db/db');
 
-async function getAccountHistory(chain_id, address, top, from, num, tx_only) {
+async function getAccountHistory(chain_id, address, anchor, from, num,
+  include_tx, include_block) {
   return new Promise(function(resolve, reject) {
-    top = Number(top);
+    anchor = Number(anchor);
     from = Number(from);
     num = Number(num);
-    var query_str;
-    var query_var;
-    if (tx_only) {
-      // exclude results from r_account_block table
-      query_str = "\
+    include_tx = include_tx === 'true';
+    include_block = include_block === 'true';
+    var query_str = "";
+    var query_var = [];
+    console.log(include_tx, include_block);
+    if (include_tx) {
+      query_str += "\
         ( \
           SELECT ct.`height` , ct.`index`, -ct.fee amount, 'tx fee' `type` \
           FROM c_txs ct \
           WHERE ct.chain_id = ? \
-            AND ct.`sender` = ? \
-            AND ct.height < ? \
-            AND ct.fee != '0' \
+            AND ct.`sender` = ? "
+            + (anchor > 0 ? "AND ct.height <= ? " : "")
+      + "   AND ct.fee != '0' \
           ORDER BY ct.`height` DESC LIMIT ? \
         ) UNION ALL ( \
           SELECT rat.`height`, rat.`index`, rat.`amount`, c_txs.`type` `type` \
@@ -25,47 +28,52 @@ async function getAccountHistory(chain_id, address, top, from, num, tx_only) {
             LEFT JOIN c_txs ON rat.chain_id = c_txs.chain_id \
             AND rat.height = c_txs.height AND rat.`index` = c_txs.`index` \
           WHERE rat.chain_id = ? \
-            AND rat.`address` = ? \
-            AND rat.height < ? \
-          ORDER BY rat.`height` DESC LIMIT ? \
+            AND rat.`address` = ? "
+            + (anchor > 0 ? "AND rat.height <= ? " : "")
+      + " ORDER BY rat.`height` DESC LIMIT ? \
         ) \
-        ORDER BY `height` DESC, `index` DESC LIMIT ?, ? \
       ";
-      query_var = [chain_id, address, top, from + num,
-        chain_id, address, top, from + num, from, num];
-    } else {
-      query_str = "\
+      if (anchor > 0) {
+        query_var = query_var.concat([
+          chain_id, address, anchor, from + num,
+          chain_id, address, anchor, from + num]);
+      } else {
+        // anchor height will not be used when anchor = 0
+        query_var = query_var.concat([
+          chain_id, address, from + num,
+          chain_id, address, from + num]);
+      }
+    }
+    if (include_block) {
+      if (query_str.length > 0) {
+        query_str += " UNION ALL ";
+      }
+      query_str += "\
         ( \
-          SELECT ct.`height` , ct.`index`, -ct.fee amount, 'tx_fee' `type` \
-          FROM c_txs ct \
-          WHERE ct.chain_id = ? \
-            AND ct.`sender` = ? \
-            AND ct.height < ? \
-            AND ct.fee != '0' \
-          ORDER BY ct.`height` DESC LIMIT ? \
-        ) UNION ALL ( \
-          SELECT rat.`height`, rat.`index`, rat.`amount`, c_txs.`type` \
-          FROM r_account_tx rat \
-            LEFT JOIN c_txs ON rat.chain_id = c_txs.chain_id \
-            AND rat.height = c_txs.height AND rat.`index` = c_txs.`index` \
-          WHERE rat.chain_id = ? \
-            AND rat.`address` = ? \
-            AND rat.height < ? \
-          ORDER BY rat.`height` DESC LIMIT ? \
-        ) UNION ALL ( \
           SELECT rab.`height`, null `index`, rab.`amount`, 'block' `type` \
           FROM r_account_block rab \
           WHERE  rab.chain_id = ? \
-            AND rab.`address` = ? \
-            AND rab.height < ? \
-          ORDER BY rab.`height` DESC LIMIT ? \
+            AND rab.`address` = ? "
+            + (anchor > 0 ? "AND rab.height <= ? " : "")
+      + " ORDER BY rab.`height` DESC LIMIT ? \
         ) \
-        ORDER BY `height` DESC, `index` DESC LIMIT ?, ? \
       ";
-      query_var = [chain_id, address, top, from + num,
-        chain_id, address, top, from + num,
-        chain_id, address, top, from + num, from, num];
+      if (anchor > 0) {
+        query_var = query_var.concat([
+          chain_id, address, anchor, from + num]);
+      } else {
+        // anchor height will not be used when anchor = 0
+        query_var = query_var.concat([
+          chain_id, address, from + num]);
+      }
     }
+    if (query_str.length == 0) {
+      return resolve([]);
+    }
+
+    query_str += " ORDER BY `height` DESC, `index` DESC LIMIT ?, ?";
+    query_var = query_var.concat([from, num]);
+
     db.query(query_str, query_var, function(err, rows, fields) {
       if (err) {
         return reject(err);

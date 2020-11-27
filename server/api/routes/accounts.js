@@ -256,7 +256,7 @@ router.get('/:address([a-fA-F0-9]+)/penalties', handleAccountPenalties);
  *   parameters:
  *     - $ref: '#/definitions/ChainId'
  *     - $ref: '#/definitions/Address'
- *     - name: top
+ *     - name: anchor
  *       in: query
  *       description: anchor height to query (0 value means last block)
  *       schema:
@@ -274,13 +274,18 @@ router.get('/:address([a-fA-F0-9]+)/penalties', handleAccountPenalties);
  *       schema:
  *         type: integer
  *         default: 20
- *     - name: tx_only
+ *     - name: include_tx
  *       in: query
- *       description: when true retrieve tx history only, otherwise retrieve
- *         block events also
+ *       description: when true include tx history
  *       schema:
  *         type: boolean
- *         default: false
+ *         default: true
+ *     - name: include_block
+ *       in: query
+ *       description: when true include block event history
+ *       schema:
+ *         type: boolean
+ *         default: true
  *   get:
  *     tags:
  *       - accounts
@@ -299,12 +304,14 @@ router.get('/:address([a-fA-F0-9]+)/penalties', handleAccountPenalties);
  */
 router.get('/:address([a-fA-F0-9]+)/history', function(req, res) {
   const chain_id = res.locals.chain_id;
-  var top = req.query.top || 0;
+  var anchor = req.query.anchor || 0;
   var from = req.query.from || 0;
   var num = req.query.num || 20;
-  var tx_only = 'tx_only' in req.query;
+  var include_tx = 'include_tx' in req.query ? req.query.include_tx : 'true';
+  var include_block = 'include_block' in req.query ? req.query.include_block : 'true';
   const address = req.params.address;
-  relation.getAccountHistory(chain_id, address, top, from, num, tx_only)
+  relation.getAccountHistory(chain_id, address, anchor, from, num,
+    include_tx, include_block)
     .then((rows) => {
       res.status(200);
       res.send(rows);
