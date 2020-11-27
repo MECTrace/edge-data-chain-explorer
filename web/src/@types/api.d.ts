@@ -112,6 +112,13 @@ type Penalty = {
   amount: string,
 }
 
+type BalanceHistory = {
+  height: number,
+  index: number,
+  amount: string,
+  type: string,
+}
+
 // https://github.com/amolabs/docs/blob/master/protocol.md#top-level-data
 interface ChainConfig {
   max_validators?: number

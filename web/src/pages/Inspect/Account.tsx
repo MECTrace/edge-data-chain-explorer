@@ -8,13 +8,14 @@ import {AxiosError} from "axios"
 import {
   txColumns,
   incentiveColumns,
+  balanceHistoryColumns,
   penaltyColumns
 } from "../../component/columns"
 import {useDispatch} from "react-redux"
 import {replace} from "connected-react-router"
 import {Tabs, Tab, Container} from "@material-ui/core"
 import InfiniteTable from "../../component/InfiniteTable"
-import {useChainId} from "../../reducer"
+import {useChainId, useHeight} from "../../reducer"
 
 const infoColumns = [
   {
@@ -46,6 +47,7 @@ const infoColumns = [
 const Account = () => {
   const dispatch = useDispatch()
   const chainId = useChainId()
+  const height = useHeight()
 
   // first section
   const {address} = useParams()
@@ -63,11 +65,14 @@ const Account = () => {
   const [statLoading, setStatLoading] = useState(true)
 
   // second section
+  const [anchorHeight, setAnchorHeight] = useState<number>(0)
   const [tab, setTab] = useState<number>(0)
   const [txs, setTxs] = useState<TransactionSchema[]>([])
   const [incentives, setIncentives] = useState<Incentive[]>([])
+  const [balanceHistory, setBalanceHistory] = useState<BalanceHistory[]>([])
   const [penalties, setPenalties] = useState<Penalty[]>([])
   const [hasMoreTxs, setHasMoreTxs] = useState<boolean>(false)
+  const [hasMoreHistory, setHasMoreHistory] = useState<boolean>(false)
   const [hasMoreIncentives, setHasMoreIncentives] = useState<boolean>(false)
   const [hasMorePenalties, setHasMorePenalties] = useState<boolean>(false)
 
@@ -76,10 +81,17 @@ const Account = () => {
   }
 
   useEffect(() => {
+    if (height > 0 && anchorHeight === 0) {
+      setAnchorHeight(height)
+    }
+  }, [height, anchorHeight])
+
+  useEffect(() => {
     setTxs([])
     setIncentives([])
+    setBalanceHistory([])
     setPenalties([])
-    if (chainId && address) {
+    if (chainId && address && anchorHeight) {
       ExplorerAPI
         .fetchAccount(chainId, address as string)
         .then(({data}) => {
@@ -87,6 +99,7 @@ const Account = () => {
           setStatLoading(false)
           setHasMoreTxs(true)
           setHasMoreIncentives(true)
+          setHasMoreHistory(true)
           setHasMorePenalties(true)
         })
         .catch((e: AxiosError) => {
@@ -94,12 +107,13 @@ const Account = () => {
           setStatLoading(false)
         })
     }
-  }, [chainId, address, dispatch])
+  }, [chainId, address, anchorHeight, dispatch])
 
   const fetchAccountTransactions = async (from: number, num: number) => {
+    console.log('fetchAccountTransactions', anchorHeight, from);
     if (chainId && address && hasMoreTxs) {
       const {data} = await ExplorerAPI
-        .fetchAccountTransactions(chainId, address, 0, from, num)
+        .fetchAccountTransactions(chainId, address, anchorHeight, from, num)
       if (data.length > 0) {
         setTxs(txs.concat(data))
       } else {
@@ -109,9 +123,10 @@ const Account = () => {
   }
 
   const fetchAccountIncentives = async (from: number, num: number) => {
+    console.log('fetchAccountIncentives', anchorHeight, from);
     if (chainId && address && hasMoreIncentives) {
       const {data} = await ExplorerAPI
-        .fetchAccountIncentives(chainId, address, 0, from, num)
+        .fetchAccountIncentives(chainId, address, anchorHeight, from, num)
       if (data.length > 0) {
         setIncentives(incentives.concat(data))
       } else {
@@ -120,10 +135,24 @@ const Account = () => {
     }
   }
 
+  const fetchBalanceHistory = async (from: number, num: number) => {
+    console.log('fetchBalanceHistory', anchorHeight, from);
+    if (chainId && address && hasMoreHistory) {
+      const {data} = await ExplorerAPI
+        .fetchBalanceHistory(chainId, address, anchorHeight, from, num)
+      if (data.length > 0) {
+        setBalanceHistory(balanceHistory.concat(data))
+      } else {
+        setHasMoreHistory(false)
+      }
+    }
+  }
+
   const fetchAccountPenalties = async (from: number, num: number) => {
+    console.log('fetchAccountPenalties', anchorHeight, from);
     if (chainId && address && hasMorePenalties) {
       const {data} = await ExplorerAPI
-        .fetchAccountPenalties(chainId, address, 0, from, num)
+        .fetchAccountPenalties(chainId, address, anchorHeight, from, num)
       if (data.length > 0) {
         setPenalties(penalties.concat(data))
       } else {
@@ -145,6 +174,7 @@ const Account = () => {
         <Tabs value={tab} onChange={handleTabChange}>
           <Tab label="Sent Txs"/>
           <Tab label="Incentives"/>
+          <Tab label="Balance History"/>
           <Tab label="Penalties"/>
         </Tabs>
       </Container>
@@ -166,6 +196,14 @@ const Account = () => {
           />
         </div>
         <div hidden={tab !== 2}>
+          <InfiniteTable
+            rows={balanceHistory}
+            columns={balanceHistoryColumns}
+            hasMore={hasMoreHistory}
+            loadMoreRows={fetchBalanceHistory}
+          />
+        </div>
+        <div hidden={tab !== 3}>
           <InfiniteTable
             rows={penalties}
             columns={penaltyColumns}

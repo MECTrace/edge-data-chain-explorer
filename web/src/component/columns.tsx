@@ -74,6 +74,48 @@ export const incentiveColumns = [
   },
 ]
 
+export const balanceHistoryColumns = [
+  {
+    key: 'height',
+    label: 'Block height',
+    width: 100,
+    format: (height: number, chainId: string) => {
+      return (
+        <Link to={`/${chainId}/inspect/block/${height}`}>
+          {height}
+        </Link>
+      )
+    }
+  },
+  {
+    key: 'index',
+    label: 'Tx index',
+    width: 100,
+    format: (index: number, chainId: string) => {
+      if (index) {
+        return (
+          <Link to={`/${chainId}/inspect/block/${index}`}>
+            {index}
+          </Link>
+        )
+      } else {
+        return '-'
+      }
+    }
+  },
+  {
+    key: 'amount',
+    label: 'Change',
+    width: 100,
+    format: displayAMO
+  },
+  {
+    key: 'type',
+    label: 'Type',
+    width: 100,
+  },
+]
+
 export const penaltyColumns = [
   {
     key: 'height',

@@ -137,6 +137,13 @@ const fetchAccountIncentives = (
     .get(`chain/${chainId}/accounts/${address}/incentives?top=${top}&from=${from}&num=${num}`)
 }
 
+const fetchBalanceHistory = (
+  chainId: string, address: string, top: number, from: number, num: number):
+    Result<BalanceHistory[]> => {
+  return client
+    .get(`chain/${chainId}/accounts/${address}/history?top=${top}&from=${from}&num=${num}`)
+}
+
 const fetchAccountPenalties = (
   chainId: string, address: string, top: number, from: number, num: number):
     Result<Penalty[]> => {
@@ -178,6 +185,7 @@ export default {
   fetchStorages,
   fetchStorage,
   fetchAccountIncentives,
+  fetchBalanceHistory,
   fetchAccountPenalties,
   fetchNodeStat,
   fetchNodes,
