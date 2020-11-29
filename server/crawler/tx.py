@@ -23,6 +23,7 @@ class Tx:
     def _vars(self):
         v = vars(self).copy()
         v['events'] = json.dumps(self.events)
+        v['fee'] = str(v['fee'])
         return v
 
     def parse_body(self, body):

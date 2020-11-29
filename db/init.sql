@@ -124,7 +124,7 @@ CREATE TABLE `c_txs` (
   `info` varchar(128) DEFAULT NULL,
   `type` char(32) NOT NULL,
   `sender` char(40) NOT NULL,
-  `fee` bigint(20) NOT NULL,
+  `fee` char(40) NOT NULL,
   `payload` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
   `last_height` int(11) NOT NULL,
   `tx_bytes` int(11) NOT NULL,

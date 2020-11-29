@@ -56,7 +56,7 @@ const stat = require('../models/stat');
  *       sender:
  *         type: string
  *       fee:
- *         type: integer
+ *         type: string
  *       payload:
  *         type: string
  *         description: marshalled JSON object of tx payload
