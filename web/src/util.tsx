@@ -1,11 +1,11 @@
 import {Link} from "react-router-dom"
 import React from "react"
 
-const UNIT = 1000000000000000000
+const ONEAMO = 1000000000000000000
 const UNITS = ['', 'K', 'M', 'G', 'T']
 
-function convert(mote: number | string) {
-  let amo = (mote as number) / UNIT
+function shorten(mote: number | string) {
+  let amo = (mote as number) / ONEAMO
 
   let idx = 0
   while (amo >= 1000 && idx < 4) {
@@ -17,14 +17,13 @@ function convert(mote: number | string) {
 }
 
 export function displayAMO(mote: number | string) {
-  const [amo, idx] = convert(mote)
+  const [amo, idx] = shorten(mote)
   return `${Number(amo.toFixed(2)).toLocaleString()} ${UNITS[idx]} AMO`
 }
 
-export function displayAMOLong(s_mote: string) {
-  const mote = Number(s_mote)
-  const amo = mote / UNIT
-  return `${mote.toLocaleString()} mote (${amo < 1 && amo !== 0 ? amo.toFixed(18) : amo.toLocaleString()} AMO)`
+export function displayAMOLong(mote: string) {
+  const amo = Number(mote) / ONEAMO
+  return `${mote} mote (${amo < 1 && amo !== 0 ? amo.toFixed(18) : amo.toLocaleString()} AMO)`
 }
 
 export function displayResult(info: string) {
