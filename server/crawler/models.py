@@ -135,7 +135,7 @@ class Parcel:
             self.owner = d['owner']
             self.custody = d['custody']
             self.proxy_account = d['proxy_account']
-            self.extra = d['extra']
+            self.extra = d.get('extra', '{}')
             self.on_sale = d['on_sale']
         else:
             cursor.execute(
@@ -147,7 +147,6 @@ class Parcel:
 
     def save(self, cursor):
         values = vars(self).copy()
-        values['extra'] = json.dumps(values['extra'])
         cursor.execute(
             """
             UPDATE `s_parcels`

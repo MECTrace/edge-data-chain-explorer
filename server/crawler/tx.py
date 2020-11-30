@@ -270,7 +270,7 @@ def tx_register(tx, cursor):
     parcel.proxy_account = payload.get('proxy_account', None)
     if parcel.proxy_account != None and len(parcel.proxy_account) > 40:
         parcel.proxy_account = parcel.proxy_account[:40]
-    parcel.extra = payload.get('extra', '{}')
+    parcel.extra = json.dumps(payload.get('extra', {}))
     parcel.on_sale = True
     parcel.save(cursor)
     rel = models.RelParcelTx(tx.chain_id, parcel.parcel_id, tx.height,
@@ -317,7 +317,7 @@ def tx_request(tx, cursor):
     request.payment = payload['payment']
     request.dealer = payload.get('dealer', None)
     request.dealer_fee = payload['dealer_fee']
-    request.extra = payload.get('extra', '{}')
+    request.extra = json.dumps(payload.get('extra', {}))
     request.save(cursor)
     rel = models.RelParcelTx(tx.chain_id, parcel.parcel_id, tx.height,
                              tx.index, cursor)
@@ -366,7 +366,7 @@ def tx_grant(tx, cursor):
                          cursor)
 
     usage.custody = payload['custody']
-    usage.extra = payload.get('extra', '{}')
+    usage.extra = json.dumps(payload.get('extra', {}))
     usage.save(cursor)
     rel = models.RelParcelTx(tx.chain_id, parcel.parcel_id, tx.height,
                              tx.index, cursor)
