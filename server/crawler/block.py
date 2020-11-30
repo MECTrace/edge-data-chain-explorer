@@ -236,9 +236,7 @@ class Block:
             for val in vals:
                 b = base64.b64decode(val['pub_key']['data'])
                 val_addr = sha256(b).hexdigest()[:40].upper()
-                if 'power' not in val or val['power'] == '0':
-                    delete_val(self.chain_id, val_addr, cursor)
-                else:
+                if 'power' in val and val['power'] != '0':
                     update_val(self.chain_id, val_addr, val['power'], cursor)
 
     def save(self, cursor):
@@ -283,21 +281,6 @@ class Block:
             WHERE
                 `chain_id` = %(chain_id)s and `height` = %(height)s
             """, self._vars())
-
-
-def delete_val(chain_id, addr, cur):
-    cur.execute(
-        """
-        UPDATE `s_accounts`
-        SET
-            `val_addr` = NULL,
-            `val_pubkey` = NULL,
-            `val_power` = '0'
-        WHERE (`chain_id` = %(chain_id)s AND `val_addr` = %(val_addr)s)
-        """, {
-            'chain_id': chain_id,
-            'val_addr': addr
-        })
 
 
 def update_val(chain_id, addr, power, cur):

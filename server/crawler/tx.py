@@ -167,6 +167,8 @@ def tx_withdraw(tx, cursor):
     sender.balance += payload['amount']
     if sender.stake == 0:
         sender.val_addr = None
+        sender.val_pubkey = None
+        sender.val_power = 0
     sender.save(cursor)
     rel = models.RelAccountTx(tx.chain_id, tx.sender, tx.height, tx.index,
                               cursor)
