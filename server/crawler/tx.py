@@ -279,19 +279,20 @@ def tx_register(tx, cursor):
                              tx.index, cursor)
     rel.save(cursor)
 
-    owner.balance -= storage.registration_fee
-    owner.save(cursor)
-    rel = models.RelAccountTx(tx.chain_id, owner.address, tx.height, tx.index,
-                              cursor)
-    rel.amount -= storage.registration_fee
-    rel.save(cursor)
+    if storage.registration_fee > 0:
+        owner.balance -= storage.registration_fee
+        owner.save(cursor)
+        rel = models.RelAccountTx(tx.chain_id, owner.address, tx.height,
+                                  tx.index, cursor)
+        rel.amount -= storage.registration_fee
+        rel.save(cursor)
 
-    host.balance += storage.registration_fee
-    host.save(cursor)
-    rel = models.RelAccountTx(tx.chain_id, host.address, tx.height, tx.index,
-                              cursor)
-    rel.amount += storage.registration_fee
-    rel.save(cursor)
+        host.balance += storage.registration_fee
+        host.save(cursor)
+        rel = models.RelAccountTx(tx.chain_id, host.address, tx.height,
+                                  tx.index, cursor)
+        rel.amount += storage.registration_fee
+        rel.save(cursor)
 
 
 def tx_discard(tx, cursor):
@@ -381,17 +382,18 @@ def tx_grant(tx, cursor):
         dealer.save(cursor)
     owner.balance -= storage.hosting_fee
     owner.save(cursor)
-    rel = models.RelAccountTx(tx.chain_id, owner.address, tx.height, tx.index,
-                              cursor)
-    rel.amount -= storage.hosting_fee
-    rel.save(cursor)
+    if storage.hosting_fee > 0:
+        rel = models.RelAccountTx(tx.chain_id, owner.address, tx.height,
+                                  tx.index, cursor)
+        rel.amount -= storage.hosting_fee
+        rel.save(cursor)
 
-    host.balance += storage.hosting_fee
-    host.save(cursor)
-    rel = models.RelAccountTx(tx.chain_id, host.address, tx.height, tx.index,
-                              cursor)
-    rel.amount += storage.hosting_fee
-    rel.save(cursor)
+        host.balance += storage.hosting_fee
+        host.save(cursor)
+        rel = models.RelAccountTx(tx.chain_id, host.address, tx.height,
+                                  tx.index, cursor)
+        rel.amount += storage.hosting_fee
+        rel.save(cursor)
 
     request.delete(cursor)
 
