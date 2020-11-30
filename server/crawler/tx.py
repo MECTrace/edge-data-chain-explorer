@@ -35,7 +35,7 @@ class Tx:
         self.type = parsed['type']
         self.sender = parsed['sender']
         self.fee = int(parsed['fee'])
-        self.last_height = int(parsed['last_height'])
+        self.last_height = int(parsed['last_height'] if parsed['last_height'] != "" else "0")
         self.payload = json.dumps(parsed['payload'])
 
     def set_result(self, result):
