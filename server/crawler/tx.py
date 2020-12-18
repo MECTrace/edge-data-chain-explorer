@@ -56,8 +56,10 @@ class Tx:
     def play(self, cursor):
         if self.code != 0:
             return
-        sender = models.Account(self.chain_id, self.sender, cursor)
-        sender.balance -= int(self.fee)
+        if self.fee > 0:
+            sender = models.Account(self.chain_id, self.sender, cursor)
+            sender.balance -= int(self.fee)
+            sender.save(cursor)
         # NOTE: fee will be added to the balance of the block proposer as part
         # of block incentive in block.play_incentives().
         processor.get(self.type, tx_unknown)(self, cursor)
@@ -264,7 +266,6 @@ def tx_register(tx, cursor):
     parcel = models.Parcel(tx.chain_id, payload['target'], owner.address,
                            cursor)
     storage = models.Storage(tx.chain_id, parcel.storage_id, None, cursor)
-    host = models.Account(tx.chain_id, storage.owner, cursor)
 
     parcel.custody = payload['custody']
     if parcel.custody != None and len(parcel.custody) > 100:
@@ -287,6 +288,7 @@ def tx_register(tx, cursor):
         rel.amount -= storage.registration_fee
         rel.save(cursor)
 
+        host = models.Account(tx.chain_id, storage.owner, cursor)
         host.balance += storage.registration_fee
         host.save(cursor)
         rel = models.RelAccountTx(tx.chain_id, host.address, tx.height,
