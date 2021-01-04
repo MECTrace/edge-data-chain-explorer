@@ -1,0 +1,13 @@
+[Unit]
+Description=AMO Crawler Collector
+
+[Service]
+Type=simple
+ExecStart=@ROOT_DIR@/server/crawler/collector.py --node @NODE_ADDR@ --limit 0
+SyslogFacility=daemon
+SyslogLevel=info
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target
+

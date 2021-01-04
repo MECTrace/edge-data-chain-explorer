@@ -1,0 +1,13 @@
+[Unit]
+Description=AMO Crawler Nodes 
+
+[Service]
+Type=simple
+ExecStart=@ROOT_DIR@/server/crawler/nodes.py --chain @CHAIN_ID@ --targets @NODE_ADDR@ -rit @REFRESH_INTERVAL@ -cit @COLLECT_INTERVAL@
+SyslogFacility=daemon
+SyslogLevel=info
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target
+

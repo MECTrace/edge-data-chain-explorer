@@ -1,0 +1,13 @@
+[Unit]
+Description=AMO Explorer API Server 
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/npm run --prefix @ROOT_DIR@/server/api start
+SyslogFacility=daemon
+SyslogLevel=info
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target
+

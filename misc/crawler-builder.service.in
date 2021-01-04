@@ -1,0 +1,13 @@
+[Unit]
+Description=AMO Crawler Builder 
+
+[Service]
+Type=simple
+ExecStart=@ROOT_DIR@/server/crawler/builder.py --chain @CHAIN_ID@ --limit 0
+SyslogFacility=daemon
+SyslogLevel=info
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target
+
