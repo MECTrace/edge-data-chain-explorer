@@ -33,7 +33,7 @@ ROOT_DIR=$1
 NODE_ADDR=$2
 CHAIN_ID=$3
 
-if [-z "$ROOT_DIR" -o -z "$NODE_ADDR" -o -z "$CHAIN_ID" ]; then
+if [ -z "$ROOT_DIR" -o -z "$NODE_ADDR" -o -z "$CHAIN_ID" ]; then
     usage
     exit 1
 fi
