@@ -33,8 +33,11 @@ def connect_db():
     # connect db
     try:
         db = mysql.connector.connect(
-            host=dbconfig['host'],
-            port=dbconfig.get('port', 3306),
+            #host=dbconfig['host'],
+            #port=dbconfig.get('port', 3306),
+            unix_socket='/var/run/mysqld/mysqld.sock',
+            buffered=True,
+            use_pure=False,
             user=dbconfig['user'],
             password=dbconfig['password'],
             database=dbconfig['database'],
