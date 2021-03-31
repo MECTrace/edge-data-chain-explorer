@@ -64,14 +64,25 @@ const handleAccountPenalties = require('./penalties').handleAccountPenalties;
  *         type: integer
  *       index:
  *         type: integer
- *         description: when `type` is 'block', `index` is `null`
  *         nullabe: true
+ *         description: when `type` is 'block', `index` is `null`
  *       amount:
  *         type: string
  *         description: quoted decimal number
- *       type:
+ *       tx_type:
  *         type: string
- *         description: one of 'tx_fee', 'block' and `type` of tx
+ *         description: either 'block' or `type` of tx. `type` is 'block' when
+ *           this balance change is due to validator incentive or penalty.
+ *       tx_sender:
+ *         type: string
+ *         description: sender address of tx
+ *       tx_fee:
+ *         type: string
+ *         description: quoted decimal number, fee of tx, always represented as
+ *           positive number
+ *       tx_payload:
+ *         type: string
+ *         description: JSON representation of tx's payload
  */
 
 /**

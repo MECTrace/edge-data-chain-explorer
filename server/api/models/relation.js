@@ -15,15 +15,10 @@ async function getAccountHistory(chain_id, address, anchor, from, num,
     if (include_tx) {
       query_str += "\
         ( \
-          SELECT ct.`height` , ct.`index`, -ct.fee amount, 'tx fee' `type` \
-          FROM c_txs ct \
-          WHERE ct.chain_id = ? \
-            AND ct.`sender` = ? "
-            + (anchor > 0 ? "AND ct.height <= ? " : "")
-      + "   AND ct.fee != '0' \
-          ORDER BY ct.`height` DESC LIMIT ? \
-        ) UNION ALL ( \
-          SELECT rat.`height`, rat.`index`, rat.`amount`, c_txs.`type` `type` \
+          SELECT rat.`chain_id`, rat.`address`, \
+            rat.`height`, rat.`index`, rat.`amount`, \
+            c_txs.`type` `tx_type`, c_txs.`sender` `tx_sender`, \
+            c_txs.fee `tx_fee`, c_txs.`tx_payload` \
           FROM r_account_tx rat \
             LEFT JOIN c_txs ON rat.chain_id = c_txs.chain_id \
             AND rat.height = c_txs.height AND rat.`index` = c_txs.`index` \
@@ -35,12 +30,10 @@ async function getAccountHistory(chain_id, address, anchor, from, num,
       ";
       if (anchor > 0) {
         query_var = query_var.concat([
-          chain_id, address, anchor, from + num,
           chain_id, address, anchor, from + num]);
       } else {
         // anchor height will not be used when anchor = 0
         query_var = query_var.concat([
-          chain_id, address, from + num,
           chain_id, address, from + num]);
       }
     }
@@ -50,7 +43,10 @@ async function getAccountHistory(chain_id, address, anchor, from, num,
       }
       query_str += "\
         ( \
-          SELECT rab.`height`, null `index`, rab.`amount`, 'block' `type` \
+          SELECT rab.`chain_id`, rab.`address`, \
+            rab.`height`, null `index`, rab.`amount`, \
+            'block' `tx_type`, '', `tx_sender`, \
+            '' `tx_fee`, '' `tx_payload` \
           FROM r_account_block rab \
           WHERE  rab.chain_id = ? \
             AND rab.`address` = ? "
