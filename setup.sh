@@ -48,32 +48,35 @@ cp -ra ./server/ $ROOT_DIR
 cp -ra ./db/ $ROOT_DIR 
 
 # server/api
-cp -f ./misc/exp-api.service.in ./exp-api.service
-sed -e s/@ROOT_DIR@/$ROOT_DIR/ -i.tmp ./exp-api.service
-mv -f ./exp-api.service /etc/systemd/system/
+cp -f ./misc/exp-api.service.in exp-api.service
+sed -e s#@ROOT_DIR@#$ROOT_DIR# -i.tmp exp-api.service
+mv -f exp-api.service /etc/systemd/system/
 npm install --prefix $ROOT_DIR/server/api
 systemctl enable exp-api.service
 
 # server/crawler/collector
-cp -f ./misc/crawler-collector.service.in ./crawler-collector.service
-sed -e s/@ROOT_DIR@/$ROOT_DIR/ -i.tmp ./crawler-collector.service
-sed -e s/@NODE_ADDR@/$NODE_ADDR/ -i.tmp ./crawler-collector.service
-mv -f ./crawler-collector.service /etc/systemd/system/crawler-collector.$CHAIN_ID.service
+cp -f ./misc/crawler-collector.service.in crawler-collector.service
+sed -e s#@ROOT_DIR@#$ROOT_DIR# -i.tmp crawler-collector.service
+sed -e s#@NODE_ADDR@#$NODE_ADDR# -i.tmp crawler-collector.service
+mv -f crawler-collector.service /etc/systemd/system/crawler-collector.$CHAIN_ID.service
 systemctl enable crawler-collector.$CHAIN_ID.service
 
 # server/crawler/builder
-cp -f ./misc/crawler-builder.service.in ./crawler-builder.service
-sed -e s/@ROOT_DIR@/$ROOT_DIR/ -i.tmp ./crawler-builder.service
-sed -e s/@CHAIN_ID@/$CHAIN_ID/ -i.tmp ./crawler-builder.service
-mv -f ./crawler-builder.service /etc/systemd/system/crawler-builder.$CHAIN_ID.service
+cp -f ./misc/crawler-builder.service.in crawler-builder.service
+sed -e s#@ROOT_DIR@#$ROOT_DIR# -i.tmp crawler-builder.service
+sed -e s#@CHAIN_ID@#$CHAIN_ID# -i.tmp crawler-builder.service
+mv -f crawler-builder.service /etc/systemd/system/crawler-builder.$CHAIN_ID.service
 systemctl enable crawler-builder.$CHAIN_ID.service
 
 # server/crawler/nodes
-cp -f ./misc/crawler-nodes.service.in ./crawler-nodes.service
-sed -e s/@ROOT_DIR@/$ROOT_DIR/ -i.tmp ./crawler-nodes.service
-sed -e s/@CHAIN_ID@/$CHAIN_ID/ -i.tmp ./crawler-nodes.service
-sed -e s/@NODE_ADDR@/$NODE_ADDR/ -i.tmp ./crawler-nodes.service
-sed -e s/@REFRESH_INTERVAL@/$REFRESH_INTERVAL/ -i.tmp ./crawler-nodes.service
-sed -e s/@COLLECT_INTERVAL@/$COLLECT_INTERVAL/ -i.tmp ./crawler-nodes.service
-mv -f ./crawler-nodes.service /etc/systemd/system/crawler-nodes.$CHAIN_ID.service
+cp -f ./misc/crawler-nodes.service.in crawler-nodes.service
+sed -e s#@ROOT_DIR@#$ROOT_DIR# -i.tmp crawler-nodes.service
+sed -e s#@CHAIN_ID@#$CHAIN_ID# -i.tmp crawler-nodes.service
+sed -e s#@NODE_ADDR@#$NODE_ADDR# -i.tmp crawler-nodes.service
+sed -e s#@REFRESH_INTERVAL@#$REFRESH_INTERVAL# -i.tmp crawler-nodes.service
+sed -e s#@COLLECT_INTERVAL@#$COLLECT_INTERVAL# -i.tmp crawler-nodes.service
+mv -f crawler-nodes.service /etc/systemd/system/crawler-nodes.$CHAIN_ID.service
 systemctl enable crawler-nodes.$CHAIN_ID.service
+
+# clean up
+rm -f *.tmp
