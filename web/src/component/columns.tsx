@@ -1,5 +1,10 @@
 import {Link} from "react-router-dom"
-import {displayAddress, displayResult, displayAMO} from "../util"
+import {
+  displayAddress,
+  displayResult,
+  displayAMO,
+  displayAMOLong,
+} from "../util"
 import React from "react"
 
 export const txColumns = [
@@ -107,7 +112,7 @@ export const balanceHistoryColumns = [
     key: 'amount',
     label: 'Change',
     width: 100,
-    format: displayAMO
+    format: displayAMOLong
   },
   {
     key: 'type',

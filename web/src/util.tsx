@@ -23,7 +23,7 @@ export function displayAMO(mote: number | string) {
 
 export function displayAMOLong(mote: string) {
   const amo = Number(mote) / ONEAMO
-  return `${mote} mote (${amo < 1 && amo !== 0 ? amo.toFixed(18) : amo.toLocaleString()} AMO)`
+  return `${amo.toLocaleString()} AMO (${mote} mote)`
 }
 
 export function displayResult(info: string) {
