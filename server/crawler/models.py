@@ -117,7 +117,7 @@ class Storage:
 class Parcel:
     def __init__(self, chain_id, parcel_id, owner, cursor):
         self.chain_id = chain_id
-        self.parcel_id = parcel_id
+        self.parcel_id = parcel_id[:72] if len(parcel_id) > 72 else parcel_id
         self.storage_id = int(parcel_id[:8], 16)
         self.owner = owner  # FK
         self.custody = ''
