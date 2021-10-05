@@ -2,8 +2,8 @@ import Axios, {AxiosResponse} from "axios"
 import {BlockInfo} from "./reducer/blocks"
 import {TransactionSchema} from "./reducer/blockchain"
 
-const defaultURL = "https://explorer.amolabs.io/api"
-//const defaultURL = "http://amo-crawler:3000"
+const defaultURL = `${document.location.origin}/api`;
+//const defaultURL = "http://amo-exp2:3000"
 //const defaultURL = "http://localhost:3001"
 
 const client = Axios.create({
