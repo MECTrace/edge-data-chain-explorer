@@ -88,11 +88,7 @@ function InfiniteTable<T>(props: InfiniteTableProps<T>) {
   // Only load 1 page of items at a time.
   // Pass an empty callback to InfiniteLoader in case it asks us to load more
   // than once.
-  const loadMore = (page: number) => {
-    if (page > 0) {
-      props.loadMoreRows((page-1)*20, 20)
-    }
-  }
+  const loadMore = (page: number) => props.loadMoreRows((page)*20, 20)
   const breakMD = useMediaQuery('(max-width: 960px)')
   const classes = useStyles()
   const chain_id = useChainId()
@@ -139,6 +135,7 @@ function InfiniteTable<T>(props: InfiniteTableProps<T>) {
           hasMore={props.hasMore}
           loadMore={loadMore}
           loader={<span key="loadingIndicator">loading...</span>}
+          initialLoad={false}
         >
           <Table
             className={classes.table}

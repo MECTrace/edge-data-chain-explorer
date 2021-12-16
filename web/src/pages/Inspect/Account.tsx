@@ -67,12 +67,12 @@ const Account = () => {
   // second section
   const [anchorHeight, setAnchorHeight] = useState<number>(0)
   const [tab, setTab] = useState<number>(0)
+  const [balanceHistory, setBalanceHistory] = useState<BalanceHistory[]>([])
   const [txs, setTxs] = useState<TransactionSchema[]>([])
   const [incentives, setIncentives] = useState<Incentive[]>([])
-  const [balanceHistory, setBalanceHistory] = useState<BalanceHistory[]>([])
   const [penalties, setPenalties] = useState<Penalty[]>([])
-  const [hasMoreTxs, setHasMoreTxs] = useState<boolean>(false)
   const [hasMoreHistory, setHasMoreHistory] = useState<boolean>(false)
+  const [hasMoreTxs, setHasMoreTxs] = useState<boolean>(false)
   const [hasMoreIncentives, setHasMoreIncentives] = useState<boolean>(false)
   const [hasMorePenalties, setHasMorePenalties] = useState<boolean>(false)
 
@@ -87,20 +87,58 @@ const Account = () => {
   }, [height, anchorHeight])
 
   useEffect(() => {
+    setHasMoreHistory(false)
+    setHasMoreTxs(false)
+    setHasMoreIncentives(false)
+    setHasMorePenalties(false)
+    setBalanceHistory([])
     setTxs([])
     setIncentives([])
-    setBalanceHistory([])
     setPenalties([])
     if (chainId && address && anchorHeight) {
       ExplorerAPI
         .fetchAccount(chainId, address as string)
         .then(({data}) => {
           setAccount(data)
+          // preload table items before handover the control to InfiniteTable
+          console.log('fetchBalanceHistory', anchorHeight, 0);
+          ExplorerAPI
+          .fetchBalanceHistory(chainId, address, anchorHeight, 0, 20)
+          .then(({data}) => {
+            if (data.length > 0) {
+              setBalanceHistory(data)
+              setHasMoreHistory(true)
+            }
+          })
+          console.log('fetchAccountTransactions', anchorHeight, 0);
+          ExplorerAPI
+          .fetchAccountTransactions(chainId, address, anchorHeight, 0, 20)
+          .then(({data}) => {
+            if (data.length > 0) {
+              setTxs(data)
+              setHasMoreTxs(true)
+            }
+          })
+          console.log('fetchAccountIncentives', anchorHeight, 0);
+          ExplorerAPI
+          .fetchAccountIncentives(chainId, address, anchorHeight, 0, 20)
+          .then(({data}) => {
+            if (data.length > 0) {
+              setIncentives(data)
+              setHasMoreIncentives(true)
+            }
+          })
+          console.log('fetchAccountPenalties', anchorHeight, 0);
+          ExplorerAPI
+          .fetchAccountPenalties(chainId, address, anchorHeight, 0, 20)
+          .then(({data}) => {
+            if (data.length > 0) {
+              setPenalties(data)
+              setHasMorePenalties(true)
+            }
+          })
+          // preload table items done
           setStatLoading(false)
-          setHasMoreTxs(true)
-          setHasMoreIncentives(true)
-          setHasMoreHistory(true)
-          setHasMorePenalties(true)
         })
         .catch((e: AxiosError) => {
           dispatch(replace(`/${chainId}/inspect/404`, {type: 'ACCOUNT', search: address}))
@@ -108,6 +146,19 @@ const Account = () => {
         })
     }
   }, [chainId, address, anchorHeight, dispatch])
+
+  const fetchBalanceHistory = async (from: number, num: number) => {
+    console.log('fetchBalanceHistory', anchorHeight, from);
+    if (chainId && address && hasMoreHistory) {
+      const {data} = await ExplorerAPI
+        .fetchBalanceHistory(chainId, address, anchorHeight, from, num)
+      if (data.length > 0) {
+        setBalanceHistory(balanceHistory.concat(data))
+      } else {
+        setHasMoreHistory(false)
+      }
+    }
+  }
 
   const fetchAccountTransactions = async (from: number, num: number) => {
     console.log('fetchAccountTransactions', anchorHeight, from);
@@ -131,19 +182,6 @@ const Account = () => {
         setIncentives(incentives.concat(data))
       } else {
         setHasMoreIncentives(false)
-      }
-    }
-  }
-
-  const fetchBalanceHistory = async (from: number, num: number) => {
-    console.log('fetchBalanceHistory', anchorHeight, from);
-    if (chainId && address && hasMoreHistory) {
-      const {data} = await ExplorerAPI
-        .fetchBalanceHistory(chainId, address, anchorHeight, from, num)
-      if (data.length > 0) {
-        setBalanceHistory(balanceHistory.concat(data))
-      } else {
-        setHasMoreHistory(false)
       }
     }
   }
@@ -172,14 +210,22 @@ const Account = () => {
       />
       <Container>
         <Tabs value={tab} onChange={handleTabChange}>
+          <Tab label="Balance History"/>
           <Tab label="Sent Txs"/>
           <Tab label="Incentives"/>
-          <Tab label="Balance History"/>
           <Tab label="Penalties"/>
         </Tabs>
       </Container>
       <Container style={{padding:"0 8px"}}>
         <div hidden={tab !== 0}>
+          <InfiniteTable
+            rows={balanceHistory}
+            columns={balanceHistoryColumns}
+            hasMore={hasMoreHistory}
+            loadMoreRows={fetchBalanceHistory}
+          />
+        </div>
+        <div hidden={tab !== 1}>
           <InfiniteTable
             rows={txs}
             columns={txColumns}
@@ -187,20 +233,12 @@ const Account = () => {
             loadMoreRows={fetchAccountTransactions}
           />
         </div>
-        <div hidden={tab !== 1}>
+        <div hidden={tab !== 2}>
           <InfiniteTable
             rows={incentives}
             columns={incentiveColumns}
             hasMore={hasMoreIncentives}
             loadMoreRows={fetchAccountIncentives}
-          />
-        </div>
-        <div hidden={tab !== 2}>
-          <InfiniteTable
-            rows={balanceHistory}
-            columns={balanceHistoryColumns}
-            hasMore={hasMoreHistory}
-            loadMoreRows={fetchBalanceHistory}
           />
         </div>
         <div hidden={tab !== 3}>
