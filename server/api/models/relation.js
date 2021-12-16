@@ -18,7 +18,7 @@ async function getAccountHistory(chain_id, address, anchor, from, num,
           SELECT rat.`chain_id`, rat.`address`, \
             rat.`height`, rat.`index`, rat.`amount`, \
             c_txs.`type` `tx_type`, c_txs.`sender` `tx_sender`, \
-            c_txs.fee `tx_fee`, c_txs.`tx_payload` \
+            c_txs.fee `tx_fee`, c_txs.payload `tx_payload` \
           FROM r_account_tx rat \
             LEFT JOIN c_txs ON rat.chain_id = c_txs.chain_id \
             AND rat.height = c_txs.height AND rat.`index` = c_txs.`index` \
