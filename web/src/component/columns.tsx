@@ -115,7 +115,7 @@ export const balanceHistoryColumns = [
     format: displayAMOLong
   },
   {
-    key: 'type',
+    key: 'tx_type',
     label: 'Type',
     width: 100,
   },
