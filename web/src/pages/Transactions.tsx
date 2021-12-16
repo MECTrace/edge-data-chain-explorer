@@ -85,25 +85,43 @@ const TxsStats = () => {
 
 const Transactions = () => {
   const chainId = useChainId()
-  const lastHeight = useHeight()
+  const height = useHeight()
 
   // first section
 
   // second section
+  const [anchorHeight, setAnchorHeight] = useState<number>(0)
   const [txs, setTxs] = useState<TransactionSchema[]>([])
   const [hasMoreTxs, setHasMoreTxs] = useState<boolean>(false)
 
   useEffect(() => {
-    setTxs([])
-    if (chainId && lastHeight) {
-      setHasMoreTxs(true)
+    if (height > 0 && anchorHeight === 0) {
+      setAnchorHeight(height)
     }
-  }, [chainId, lastHeight])
+  }, [height, anchorHeight])
+
+  useEffect(() => {
+    setHasMoreTxs(false)
+    setTxs([])
+    if (chainId && anchorHeight) {
+      // preload table items before handover the control to InfiniteTable
+      console.log('fetchTxs', anchorHeight, 0);
+      ExplorerAPI
+      .fetchTransactions(chainId, anchorHeight, 0, 20)
+      .then(({data}) => {
+        setTxs(data)
+        if (data.length >= 20) {
+          setHasMoreTxs(true)
+        }
+      })
+      // preload table items done
+    }
+  }, [chainId, anchorHeight])
 
   const fetchTxs = async (from: number, num: number) => {
     if (chainId && hasMoreTxs) {
       const {data} = await ExplorerAPI
-        .fetchTransactions(chainId, lastHeight, from, num)
+        .fetchTransactions(chainId, anchorHeight, from, num)
       if (data.length > 0) {
         setTxs(txs.concat(data))
       } else {

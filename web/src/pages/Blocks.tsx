@@ -138,25 +138,43 @@ const BlocksStatView = () => {
 
 const Blocks = () => {
   const chainId = useChainId()
-  const lastHeight = useHeight()
+  const height = useHeight()
 
   // first section
 
   // second section
+  const [anchorHeight, setAnchorHeight] = useState<number>(0)
   const [blocks, setBlocks] = useState<BlockInfo[]>([])
   const [hasMoreBlocks, setHasMoreBlocks] = useState<boolean>(false)
 
   useEffect(() => {
-    setBlocks([])
-    if (chainId && lastHeight) {
-      setHasMoreBlocks(true)
+    if (height > 0 && anchorHeight === 0) {
+      setAnchorHeight(height)
     }
-  }, [chainId, lastHeight])
+  }, [height, anchorHeight])
+
+  useEffect(() => {
+    setHasMoreBlocks(false)
+    setBlocks([])
+    if (chainId && anchorHeight) {
+      // preload table items before handing over the control to InfiniteTable
+      console.log('fetchBlocks', anchorHeight, 0);
+      ExplorerAPI
+      .fetchBlocks(chainId, anchorHeight, 0, 20)
+      .then(({data}) => {
+        setBlocks(data)
+        if (data.length >= 20) {
+          setHasMoreBlocks(true)
+        }
+      })
+      // preload table items done
+    }
+  }, [chainId, anchorHeight])
 
   const fetchBlocks = async (from: number, num: number) => {
     if (chainId && hasMoreBlocks) {
       const {data} = await ExplorerAPI
-        .fetchBlocks(chainId, lastHeight, from, num)
+        .fetchBlocks(chainId, anchorHeight, from, num)
       if (data.length > 0) {
         setBlocks(blocks.concat(data))
       } else {

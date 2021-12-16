@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react'
-import {useChainId} from "../reducer"
+import {useChainId, useHeight} from "../reducer"
 import ExplorerAPI from "../ExplorerAPI"
 import {AxiosError} from "axios"
 
@@ -82,21 +82,45 @@ const draftListColumn = [
 
 const Governance = () => {
   const chainId = useChainId()
+  const height = useHeight()
+
+  // first section
   const [stat, setStat] = useState<DraftStat>({
     num_drafts: 0,
     num_passed: 0,
   })
   const [chainConfig, setChainConfig] = useState<ChainConfig>({})
+
+  // second section
+  const [anchorHeight, setAnchorHeight] = useState<number>(0)
   const [drafts, setDrafts] = useState<Draft[]>([])
   const [hasMore, setHasMore] = useState<boolean>(false)
 
   useEffect(() => {
-    if (chainId) {
+    if (height > 0 && anchorHeight === 0) {
+      setAnchorHeight(height)
+    }
+  }, [height, anchorHeight])
+
+  useEffect(() => {
+    setHasMore(false)
+    setDrafts([])
+    if (chainId && anchorHeight) {
       ExplorerAPI
         .fetchDraftStat(chainId)
         .then(({data}) => {
           setStat(data)
-          setHasMore(true)
+          // preload table items before handover the control to InfiniteTable
+          console.log('fetchDrafts', anchorHeight, 0);
+          ExplorerAPI
+          .fetchDrafts(chainId, anchorHeight, 0, 20)
+          .then(({data}) => {
+            setDrafts(data)
+            if (data.length >= 20) {
+              setHasMore(true)
+            }
+          })
+          // preload table items done
         })
         .catch((e: AxiosError) => {
         })
@@ -108,12 +132,13 @@ const Governance = () => {
         .catch((e: AxiosError) => {
         })
     }
-  }, [chainId])
+  }, [chainId, anchorHeight])
 
   const fetchDrafts = async (from: number, num: number) => {
+    console.log('fetchDrafts', anchorHeight, from);
     if (chainId && hasMore) {
       const {data} = await ExplorerAPI
-        .fetchDrafts(chainId, 0, from, num)
+        .fetchDrafts(chainId, anchorHeight, from, num)
       if (data.length > 0) {
         setDrafts(drafts.concat(data))
       } else {

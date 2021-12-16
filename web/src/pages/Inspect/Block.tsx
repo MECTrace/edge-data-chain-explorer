@@ -63,17 +63,28 @@ const Block = () => {
   const [hasMoreTxs, setHasMoreTxs] = useState<boolean>(false)
 
   useEffect(() => {
+    setHasMoreTxs(false)
     setTxs([])
     if (chainId && height) {
       ExplorerAPI
         .fetchBlock(chainId, height as number)
         .then(({data}) => {
           setBlock(data)
+          // preload table items before handover the control to InfiniteTable
+          ExplorerAPI
+          .fetchBlockTransactions(chainId, height, 0, 20)
+          .then(({data}) => {
+            setTxs(data)
+            if (data.length >= 20) {
+              setHasMoreTxs(true)
+            }
+          })
+          // preload table items done
           setStatLoading(false)
-          setHasMoreTxs(true)
         })
         .catch(() => {
-          dispatch(replace(`/${chainId}/inspect/404`, {type: 'BLOCK', search: height}))
+          dispatch(replace(`/${chainId}/inspect/404`,
+                           {type: 'BLOCK', search: height}))
           setStatLoading(false)
         })
     }
