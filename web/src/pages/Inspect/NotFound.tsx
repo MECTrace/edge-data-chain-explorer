@@ -28,13 +28,13 @@ const message = (errorType: string, searchText: string) => {
     case 'ACCOUNT':
       return (
         <h2>
-          Account #{searchText}
+          Account {searchText}
         </h2>
       )
     case 'TRANSACTION':
       return (
         <h2>
-          Transaction #{searchText}
+          Transaction {searchText}
         </h2>
       )
     case 'DRAFT':
