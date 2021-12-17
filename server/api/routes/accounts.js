@@ -73,6 +73,9 @@ const handleAccountPenalties = require('./penalties').handleAccountPenalties;
  *         type: string
  *         description: either 'block' or `type` of tx. `type` is 'block' when
  *           this balance change is due to validator incentive or penalty.
+ *       tx_hash:
+ *         type: string
+ *         description: hash of tx
  *       tx_sender:
  *         type: string
  *         description: sender address of tx
