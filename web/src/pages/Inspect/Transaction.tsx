@@ -163,6 +163,17 @@ const payloadColumns: StringMap = {
       format: displayMono,
     },
     {
+      key: 'recipient',
+      header: 'Recipient Address',
+      format: (recp: string, chainId: string) => {
+        if (!recp) {
+          return 'none. This means the recipient is the tx sender.';
+        } else {
+          return displayAddress(recp, chainId);
+        }
+      },
+    },
+    {
       key: 'payment',
       header: 'Payment',
       format: displayAMOLong
