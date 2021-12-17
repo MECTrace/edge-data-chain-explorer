@@ -95,7 +95,7 @@ export const balanceHistoryColumns = [
     key: 'index',
     label: 'Tx index',
     format: (index: number, chainId: string) => {
-      if (index !== undefined) {
+      if (index !== null || index !== undefined) {
         return index;
       } else {
         return '-'
@@ -117,11 +117,15 @@ export const balanceHistoryColumns = [
     label: 'Tx Hash',
     style: {flexGrow: 8},
     format: (hash: string, chainId: string) => {
-      return (
-        <Link to={`/${chainId}/inspect/tx/${hash}`}>
-          <code>{hash}</code>
-        </Link>
-      )
+      if (hash !== null || hash !== undefined) {
+        return (
+          <Link to={`/${chainId}/inspect/tx/${hash}`}>
+            <code>{hash}</code>
+          </Link>
+        )
+      } else {
+        return '-';
+      }
     }
   },
   {
