@@ -26,7 +26,7 @@ export const txColumns = [
   {
     key: 'hash',
     label: 'Hash',
-    style: {flexGrow: 8},
+    style: {flexGrow: 10},
     format: (hash: string, chainId: string) => {
       return (
         <Link to={`/${chainId}/inspect/tx/${hash}`}>
@@ -38,7 +38,7 @@ export const txColumns = [
   {
     key: 'sender',
     label: 'Sender',
-    style: {flexGrow: 8},
+    style: {flexGrow: 10},
     format: displayAddress,
   },
   {
@@ -83,7 +83,6 @@ export const balanceHistoryColumns = [
   {
     key: 'height',
     label: 'Block height',
-    width: 100,
     format: (height: number, chainId: string) => {
       return (
         <Link to={`/${chainId}/inspect/block/${height}`}>
@@ -95,7 +94,6 @@ export const balanceHistoryColumns = [
   {
     key: 'index',
     label: 'Tx index',
-    width: 100,
     format: (index: number, chainId: string) => {
       if (index) {
         return (
@@ -110,14 +108,41 @@ export const balanceHistoryColumns = [
   },
   {
     key: 'amount',
-    label: 'Change',
-    width: 100,
+    label: 'Change amount',
+    style: {flexGrow: 10},
     format: displayAMOLong
   },
   {
     key: 'tx_type',
     label: 'Type',
-    width: 100,
+  },
+  {
+    key: 'tx_sender',
+    label: 'Tx sender',
+    style: {flexGrow: 8},
+    format: (sender: string, chainId: string) => {
+      if (sender) {
+        return (
+          <Link to={`/${chainId}/inspect/account/${sender}`}>
+            {sender}
+          </Link>
+        )
+      } else {
+        return '-'
+      }
+    }
+  },
+  {
+    key: 'tx_fee',
+    label: 'Tx fee',
+    style: {flexGrow: 4},
+    format: (fee: string) => {
+      if (fee !== '') {
+        return displayAMOLong(fee)
+      } else {
+        return '-'
+      }
+    }
   },
 ]
 
